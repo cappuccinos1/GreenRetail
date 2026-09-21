@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Features.Checkout"
+             x:Class="GreenRetail.Features.Checkout.CheckoutPage"
+             x:DataType="vm:CheckoutViewModel"
+             Title="Checkout">
+
+    <Grid Padding="24">
+
+        <VerticalStackLayout WidthRequest="420"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Spacing="12">
+
+            <Label Text="Checkout"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="{Binding Total, StringFormat='Total: {0}'}"
+                   FontSize="20" />
+
+            <Picker Title="Payment Method"
+                    ItemsSource="{Binding PaymentMethods}"
+                    SelectedItem="{Binding SelectedPaymentMethod}" />
+
+            <Entry Text="{Binding TenderedAmount}"
+                   Keyboard="Numeric"
+                   Placeholder="Amount tendered" />
+
+            <Label Text="{Binding ChangeDue, StringFormat='Change: {0}'}"
+                   FontSize="18" />
+
+            <Label Text="{Binding BalanceDue, StringFormat='Balance Due: {0}'}"
+                   FontSize="18" />
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="Gray" />
+
+            <Button Text="Complete Sale"
+                    Command="{Binding CompleteSaleCommand}" />
+
+            <Button Text="Back"
+                    Command="{Binding BackCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

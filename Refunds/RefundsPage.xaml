@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Refunds"
+             x:Class="GreenRetail.Refunds.RefundsPage"
+             x:DataType="vm:RefundsViewModel"
+             Title="Refunds / Store Credit">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16">
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="Gray" />
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Initiate Refund Request"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding RefundSaleIdText}"
+                           Placeholder="Optional Sale ID" />
+
+                    <Entry Text="{Binding RefundReason}"
+                           Placeholder="Reason" />
+
+                    <Entry Text="{Binding RefundAmountText}"
+                           Placeholder="Amount in naira"
+                           Keyboard="Numeric" />
+
+                    <Button Text="Initiate Refund Request"
+                            Command="{Binding InitiateRefundCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Pending Refunds"
+                           FontAttributes="Bold" />
+
+                    <Button Text="Refresh Pending Refunds"
+                            Command="{Binding RefreshPendingRefundsCommand}" />
+
+                    <CollectionView ItemsSource="{Binding PendingRefunds}"
+                                    SelectedItem="{Binding SelectedRefund}"
+                                    SelectionMode="Single"
+                                    HeightRequest="160">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RefundListItem">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding Reason}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Total}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Status}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="3"
+                                           Text="{Binding Created}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="{Binding SelectedRefundText}"
+                           FontAttributes="Italic" />
+
+                    <Entry Text="{Binding CustomerName}"
+                           Placeholder="Customer name" />
+
+                    <Entry Text="{Binding CustomerPhone}"
+                           Placeholder="Customer phone" />
+
+                    <Button Text="Approve Selected Refund"
+                            Command="{Binding ApproveSelectedRefundCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Store Credit Vouchers"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding IssueAmountText}"
+                           Placeholder="Voucher amount in naira"
+                           Keyboard="Numeric" />
+
+                    <Button Text="Issue Voucher"
+                            Command="{Binding IssueVoucherCommand}" />
+
+                    <Button Text="Refresh Vouchers"
+                            Command="{Binding RefreshActiveVouchersCommand}" />
+
+                    <CollectionView ItemsSource="{Binding ActiveVouchers}"
+                                    SelectionMode="None"
+                                    HeightRequest="160">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:VoucherListItem">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding Code}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Amount}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Balance}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="3"
+                                           Text="{Binding Status}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Entry Text="{Binding RedeemCodeText}"
+                           Placeholder="Voucher code" />
+
+                    <Entry Text="{Binding RedeemAmountText}"
+                           Placeholder="Redemption amount in naira"
+                           Keyboard="Numeric" />
+
+                    <Button Text="Redeem Voucher"
+                            Command="{Binding RedeemVoucherCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

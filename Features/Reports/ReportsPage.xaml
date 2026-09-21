@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Features.Reports"
+             x:Class="GreenRetail.Features.Reports.ReportsPage"
+             x:DataType="vm:ReportsViewModel"
+             Title="Reports">
+
+    <Grid Padding="24">
+
+        <VerticalStackLayout WidthRequest="600"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Spacing="12">
+
+            <Label Text="Daily Report"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="{Binding ReportText}"
+                   LineBreakMode="WordWrap" />
+
+            <Button Text="Refresh"
+                    Command="{Binding RefreshCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

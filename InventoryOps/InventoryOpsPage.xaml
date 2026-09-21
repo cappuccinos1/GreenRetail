@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.InventoryOps"
+             xmlns:catalog="clr-namespace:GreenRetail.Features.Catalog"
+             x:Class="GreenRetail.InventoryOps.InventoryOpsPage"
+             x:DataType="vm:InventoryOpsViewModel"
+             Title="Inventory Operations">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16">
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="Gray" />
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Product Search"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding SearchText}"
+                           Placeholder="Search product by name, SKU, barcode" />
+
+                    <Button Text="Search Products"
+                            Command="{Binding SearchProductsCommand}" />
+
+                    <CollectionView ItemsSource="{Binding Products}"
+                                    SelectedItem="{Binding SelectedProduct}"
+                                    SelectionMode="Single"
+                                    HeightRequest="180">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="catalog:ProductSummary">
+                                <Grid ColumnDefinitions="*,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding Name}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Sku}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding SellingPrice}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="{Binding SelectedProductText}"
+                           FontAttributes="Italic" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Stock Adjustment"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding AdjustmentQuantityText}"
+                           Placeholder="Quantity change, e.g. -2 or 10"
+                           Keyboard="Numeric" />
+
+                    <Entry Text="{Binding AdjustmentReason}"
+                           Placeholder="Reason, e.g. Damage, Expiry, Missing" />
+
+                    <Entry Text="{Binding AdjustmentNote}"
+                           Placeholder="Optional note" />
+
+                    <Button Text="Request Stock Adjustment"
+                            Command="{Binding RequestStockAdjustmentCommand}" />
+
+                    <Button Text="Refresh Pending Adjustments"
+                            Command="{Binding RefreshAdjustmentsCommand}" />
+
+                    <CollectionView ItemsSource="{Binding PendingAdjustments}"
+                                    SelectedItem="{Binding SelectedAdjustment}"
+                                    SelectionMode="Single"
+                                    HeightRequest="160">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:StockAdjustmentListItem">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding ProductName}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding QuantityChange}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Reason}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="3"
+                                           Text="{Binding Status}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="{Binding SelectedAdjustmentText}"
+                           FontAttributes="Italic" />
+
+                    <Button Text="Approve Selected Adjustment"
+                            Command="{Binding ApproveSelectedAdjustmentCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="POS Stock Override"
+                           FontAttributes="Bold" />
+
+                    <Button Text="Request Override For Selected Product"
+                            Command="{Binding RequestStockOverrideCommand}" />
+
+                    <Button Text="Refresh Pending Overrides"
+                            Command="{Binding RefreshOverridesCommand}" />
+
+                    <CollectionView ItemsSource="{Binding PendingOverrides}"
+                                    SelectedItem="{Binding SelectedOverride}"
+                                    SelectionMode="Single"
+                                    HeightRequest="160">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:StockOverrideListItem">
+                                <Grid ColumnDefinitions="*,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding ProductName}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Reason}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Status}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="{Binding SelectedOverrideText}"
+                           FontAttributes="Italic" />
+
+                    <Entry Text="{Binding OverrideQuantityText}"
+                           Placeholder="Quantity to add, e.g. 5"
+                           Keyboard="Numeric" />
+
+                    <Button Text="Resolve Selected Override"
+                            Command="{Binding ResolveSelectedOverrideCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

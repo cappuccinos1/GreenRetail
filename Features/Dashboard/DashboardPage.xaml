@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Features.Dashboard"
+             x:Class="GreenRetail.Features.Dashboard.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
+             Title="My Workspace"
+             BackgroundColor="#F3F4F6"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto, *">
+        
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#10B981" Padding="30,40,30,30" StrokeThickness="0">
+            <VerticalStackLayout>
+                <Label Text="{Binding Greeting}" FontSize="28" FontAttributes="Bold" TextColor="White" />
+                <Label Text="{Binding Role, StringFormat='Role: {0}'}" FontSize="16" TextColor="#D1FAE5" Margin="0,5,0,0" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Workspace Tiles -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Tiles}" Margin="20">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="20" VerticalItemSpacing="20" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:DashboardTile">
+                    <Border BackgroundColor="White" 
+                            Stroke="#E5E7EB" 
+                            StrokeThickness="1" 
+                            Padding="20" 
+                            HeightRequest="160">
+                        <Border.Shadow>
+                            <Shadow Brush="Black" Opacity="0.05" Radius="10" Offset="0,4" />
+                        </Border.Shadow>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BindingContext.NavigateToWorkspaceCommand, Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}}" 
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        
+                        <Grid RowDefinitions="Auto, *, Auto">
+                            <!-- Colored Icon Placeholder -->
+                            <Border Grid.Row="0" 
+                                    BackgroundColor="{Binding BackgroundColor}" 
+                                    WidthRequest="40" HeightRequest="40" 
+                                    StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8" />
+                                </Border.StrokeShape>
+                                <Label Text="{Binding Title, Converter={StaticResource FirstLetterConverter}}" 
+                                       TextColor="White" FontSize="20" FontAttributes="Bold" 
+                                       HorizontalOptions="Center" VerticalOptions="Center" />
+                            </Border>
+
+                            <Label Grid.Row="1" Text="{Binding Title}" FontSize="18" FontAttributes="Bold" TextColor="#1F2937" Margin="0,15,0,0" />
+                            <Label Grid.Row="2" Text="{Binding Description}" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

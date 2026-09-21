@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Features.Hub"
+             x:Class="GreenRetail.Features.Hub.HubPage"
+             x:DataType="vm:HubViewModel"
+             Title="Green Retail"
+             BackgroundColor="#F3F4F6">
+
+    <Grid RowDefinitions="Auto, *">
+        
+        <!-- Top Bar -->
+        <Grid Grid.Row="0" BackgroundColor="#10B981" Padding="20" ColumnDefinitions="*, Auto, Auto">
+            <Label Text="Green Retail" FontSize="24" FontAttributes="Bold" TextColor="White" VerticalOptions="Center"/>
+            <Label Grid.Column="1" Text="{Binding UserName, StringFormat='User: {0}'}" TextColor="White" VerticalOptions="Center" Margin="0,0,20,0"/>
+            <Button Grid.Column="2" Text="Logout" Command="{Binding LogoutCommand}" BackgroundColor="White" TextColor="#10B981" FontAttributes="Bold"/>
+        </Grid>
+
+        <!-- Hub Tiles -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Tiles}" Margin="20">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="20" VerticalItemSpacing="20" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:HubTile">
+                    <Frame BackgroundColor="White" CornerRadius="12" Padding="20" HasShadow="True" HeightRequest="150">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BindingContext.NavigateToHubCommand, Source={RelativeSource AncestorType={x:Type vm:HubViewModel}}}" 
+                                                  CommandParameter="{Binding .}" />
+                        </Frame.GestureRecognizers>
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
+                            <Label Text="{Binding Title}" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#1F2937"/>
+                            <Label Text="{Binding RequiredRole, StringFormat='({0})'}" FontSize="12" TextColor="#6B7280" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

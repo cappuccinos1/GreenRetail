@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.BackOffice"
+             x:Class="GreenRetail.BackOffice.BackOfficePage"
+             x:DataType="vm:BackOfficeViewModel"
+             Title="Back Office">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="12">
+
+            <Label Text="Back Office"
+                   FontSize="24"
+                   FontAttributes="Bold" />
+
+            <Button Text="Inventory Operations"
+                    Command="{Binding GoInventoryOpsCommand}" />
+
+            <Button Text="Procurement / Receiving"
+                    Command="{Binding GoProcurementCommand}" />
+
+            <Button Text="Refunds / Store Credit"
+                    Command="{Binding GoRefundsCommand}" />
+
+            <Button Text="Security Verification"
+                    Command="{Binding GoSecurityCommand}" />
+
+            <Button Text="Accounting Trial Balance"
+                    Command="{Binding GoTrialBalanceCommand}" />
+
+            <Button Text="RBAC Explorer"
+                    Command="{Binding GoRbacExplorerCommand}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

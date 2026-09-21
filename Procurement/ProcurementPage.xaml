@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Procurement"
+             xmlns:catalog="clr-namespace:GreenRetail.Features.Catalog"
+             x:Class="GreenRetail.Procurement.ProcurementPage"
+             x:DataType="vm:ProcurementViewModel"
+             Title="Procurement / Receiving">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16">
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="Gray" />
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Product Search"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding ProductSearchText}"
+                           Placeholder="Search product" />
+
+                    <Button Text="Search Products"
+                            Command="{Binding SearchProductsCommand}" />
+
+                    <CollectionView ItemsSource="{Binding Products}"
+                                    SelectedItem="{Binding SelectedProduct}"
+                                    SelectionMode="Single"
+                                    HeightRequest="160">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="catalog:ProductSummary">
+                                <Grid ColumnDefinitions="*,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding Name}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Sku}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding SellingPrice}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="{Binding SelectedProductText}"
+                           FontAttributes="Italic" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Suppliers"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding SupplierName}"
+                           Placeholder="Supplier name" />
+
+                    <Entry Text="{Binding SupplierPhone}"
+                           Placeholder="Phone" />
+
+                    <Entry Text="{Binding SupplierEmail}"
+                           Placeholder="Email" />
+
+                    <Entry Text="{Binding SupplierAddress}"
+                           Placeholder="Address" />
+
+                    <Button Text="Create Supplier"
+                            Command="{Binding CreateSupplierCommand}" />
+
+                    <Button Text="Refresh Suppliers"
+                            Command="{Binding RefreshSuppliersCommand}" />
+
+                    <CollectionView ItemsSource="{Binding Suppliers}"
+                                    SelectedItem="{Binding SelectedSupplier}"
+                                    SelectionMode="Single"
+                                    HeightRequest="140">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SupplierListItem">
+                                <Grid ColumnDefinitions="*,Auto" Padding="4">
+                                    <Label Text="{Binding Name}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Phone}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="{Binding SelectedSupplierText}"
+                           FontAttributes="Italic" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Create Purchase Order"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding PoQuantityText}"
+                           Placeholder="Quantity"
+                           Keyboard="Numeric" />
+
+                    <Entry Text="{Binding PoUnitCostText}"
+                           Placeholder="Unit cost"
+                           Keyboard="Numeric" />
+
+                    <Button Text="Add PO Line"
+                            Command="{Binding AddPurchaseOrderLineCommand}" />
+
+                    <CollectionView ItemsSource="{Binding PurchaseOrderLines}"
+                                    SelectionMode="None"
+                                    HeightRequest="120">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:NewPurchaseOrderLineItem">
+                                <Grid ColumnDefinitions="*,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding ProductName}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Quantity}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding UnitCost}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Entry Text="{Binding PoNotes}"
+                           Placeholder="PO notes" />
+
+                    <Button Text="Create Purchase Order"
+                            Command="{Binding CreatePurchaseOrderCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Active Purchase Orders"
+                           FontAttributes="Bold" />
+
+                    <Button Text="Refresh Purchase Orders"
+                            Command="{Binding RefreshActivePurchaseOrdersCommand}" />
+
+                    <CollectionView ItemsSource="{Binding ActivePurchaseOrders}"
+                                    SelectedItem="{Binding SelectedPurchaseOrder}"
+                                    SelectionMode="Single"
+                                    HeightRequest="140">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:PurchaseOrderListItem">
+                                <Grid ColumnDefinitions="*,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding Number}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding SupplierName}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Total}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="{Binding SelectedPurchaseOrderText}"
+                           FontAttributes="Italic" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Receive Goods / GRN"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding VendorInvoiceNumber}"
+                           Placeholder="Vendor invoice number" />
+
+                    <Entry Text="{Binding VendorInvoiceDateText}"
+                           Placeholder="Vendor invoice date yyyy-MM-dd" />
+
+                    <Entry Text="{Binding GrnAcceptedQuantityText}"
+                           Placeholder="Accepted quantity"
+                           Keyboard="Numeric" />
+
+                    <Entry Text="{Binding GrnRejectedQuantityText}"
+                           Placeholder="Rejected quantity"
+                           Keyboard="Numeric" />
+
+                    <Entry Text="{Binding GrnExpiryText}"
+                           Placeholder="Expiry date yyyy-MM-dd" />
+
+                    <Entry Text="{Binding GrnBatchText}"
+                           Placeholder="Batch number" />
+
+                    <Button Text="Add GRN Line"
+                            Command="{Binding AddGrnLineCommand}" />
+
+                    <CollectionView ItemsSource="{Binding GrnLines}"
+                                    SelectionMode="None"
+                                    HeightRequest="120">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:NewGrnLineItem">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding ProductName}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Accepted}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Rejected}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="3"
+                                           Text="{Binding Batch}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Entry Text="{Binding GrnNotes}"
+                           Placeholder="GRN notes" />
+
+                    <Button Text="Post GRN"
+                            Command="{Binding PostGrnCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

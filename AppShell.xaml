@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:auth="clr-namespace:GreenRetail.Features.Auth"
+       xmlns:hubs="clr-namespace:GreenRetail.Features.Hubs"
+       xmlns:dashboard="clr-namespace:GreenRetail.Features.Dashboard"
+       x:Class="GreenRetail.AppShell"
+       FlyoutBehavior="Flyout"
+       FlyoutWidth="280"
+       Shell.NavBarIsVisible="False"
+       Shell.FlyoutBackgroundColor="#111827">
+
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label" Class="FlyoutItemLabelStyle">
+                <Setter Property="TextColor" Value="#F9FAFB" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+            
+            <!-- Register the converter globally -->
+            <dashboard:FirstLetterConverter x:Key="FirstLetterConverter" />
+        </ResourceDictionary>
+    </Shell.Resources>
+
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid ColumnDefinitions="50, *" Padding="10,15" BackgroundColor="Transparent">
+                <Image Source="{Binding FlyoutIcon}" HeightRequest="24" WidthRequest="24" VerticalOptions="Center" HorizontalOptions="Center" />
+                <Label Grid.Column="1" Text="{Binding Title}" StyleClass="FlyoutItemLabelStyle" Margin="10,0,0,0" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <!-- Hidden Login Route -->
+    <ShellContent Route="login"
+                  ContentTemplate="{DataTemplate auth:LoginPage}"
+                  FlyoutItemIsVisible="False"
+                  Shell.FlyoutBehavior="Disabled" />
+
+    <!-- WORKSPACE DASHBOARD (Home) -->
+    <FlyoutItem Title="My Workspace" Icon="dotnet_bot.png" Route="dashboard">
+        <ShellContent ContentTemplate="{DataTemplate dashboard:DashboardPage}" />
+    </FlyoutItem>
+
+    <!-- THE 7 FUNCTIONAL HUBS -->
+    <FlyoutItem Title="Sell" Icon="dotnet_bot.png" Route="sell">
+        <ShellContent ContentTemplate="{DataTemplate hubs:SellHubPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Inventory" Icon="dotnet_bot.png" Route="inventory">
+        <ShellContent ContentTemplate="{DataTemplate hubs:InventoryHubPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Purchasing" Icon="dotnet_bot.png" Route="purchasing">
+        <ShellContent ContentTemplate="{DataTemplate hubs:PurchasingHubPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Quality Control" Icon="dotnet_bot.png" Route="qc">
+        <ShellContent ContentTemplate="{DataTemplate hubs:QcHubPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Accounts" Icon="dotnet_bot.png" Route="accounts">
+        <ShellContent ContentTemplate="{DataTemplate hubs:AccountsHubPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Audit" Icon="dotnet_bot.png" Route="audit">
+        <ShellContent ContentTemplate="{DataTemplate hubs:AuditHubPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Settings" Icon="dotnet_bot.png" Route="settings">
+        <ShellContent ContentTemplate="{DataTemplate hubs:SettingsHubPage}" />
+    </FlyoutItem>
+
+</Shell>

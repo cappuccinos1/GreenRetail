@@ -1,0 +1,17 @@
+using Microsoft.Extensions.DependencyInjection;
+
+namespace GreenRetail.Features.Auth;
+
+public static class AuthModule
+{
+    public static IServiceCollection AddAuthFeature(this IServiceCollection services)
+    {
+        services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
+        services.AddTransient<IAuthenticateUserUseCase, AuthenticateUserUseCase>();
+
+        services.AddTransient<LoginViewModel>();
+        services.AddTransient<LoginPage>();
+
+        return services;
+    }
+}

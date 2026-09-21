@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Accounting"
+             x:Class="GreenRetail.Accounting.TrialBalancePage"
+             x:DataType="vm:TrialBalanceViewModel"
+             Title="Trial Balance">
+
+    <Grid Padding="16"
+          RowDefinitions="Auto,Auto,*">
+
+        <Label Text="{Binding SummaryText}"
+               FontAttributes="Bold" />
+
+        <Button Grid.Row="1"
+                Margin="0,8,0,0"
+                Text="Refresh Trial Balance"
+                Command="{Binding RefreshCommand}" />
+
+        <CollectionView Grid.Row="2"
+                        Margin="0,8,0,0"
+                        ItemsSource="{Binding Lines}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:TrialBalanceLineVm">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" Padding="4">
+                        <Label Text="{Binding Code}" WidthRequest="70" />
+                        <Label Grid.Column="1" Text="{Binding Name}" />
+                        <Label Grid.Column="2" Text="{Binding Debit}" WidthRequest="100" />
+                        <Label Grid.Column="3" Text="{Binding Credit}" WidthRequest="100" />
+                        <Label Grid.Column="4" Text="{Binding Balance}" WidthRequest="100" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

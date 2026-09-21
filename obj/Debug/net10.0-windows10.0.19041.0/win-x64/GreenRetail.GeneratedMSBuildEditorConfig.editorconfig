@@ -1,0 +1,303 @@
+is_global = true
+build_property.MauiXamlNoWarn = 
+build_property.EnableMauiXamlDiagnostics = true
+build_property.MauiXamlLineInfo = 
+build_property.Configuration = Debug
+build_property.TargetFramework = net10.0-windows10.0.19041.0
+build_property.TargetFramework = net10.0-windows10.0.19041.0
+build_property.TargetPlatformMinVersion = 10.0.17763.0
+build_property.TargetPlatformMinVersion = 10.0.17763.0
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 9A19103F-16F7-4668-BE54-9A1E7A4F7556
+build_property.ProjectTypeGuids = 9A19103F-16F7-4668-BE54-9A1E7A4F7556
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.MvvmToolkitEnableINotifyPropertyChangingSupport = true
+build_property._MvvmToolkitIsUsingWindowsRuntimePack = true
+build_property.CsWinRTComponent = 
+build_property.CsWinRTAotOptimizerEnabled = true
+build_property.CsWinRTAotOptimizerEnabled = true
+build_property.CsWinRTAotWarningLevel = 
+build_property.CsWinRTAotWarningLevel = 
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
+build_property.EntryPointFilePath = 
+build_property.RootNamespace = GreenRetail
+build_property.ProjectDir = C:\Users\DELL\GreenRetail\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTAotExportsEnabled = 
+build_property.CsWinRTRcwFactoryFallbackGeneratorForceOptIn = 
+build_property.CsWinRTRcwFactoryFallbackGeneratorForceOptOut = 
+build_property.CsWinRTCcwLookupTableGeneratorEnabled = true
+build_property.CsWinRTMergeReferencedActivationFactories = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 10.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/DELL/GreenRetail/Accounting/TrialBalancePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Accounting.TrialBalancePage.xaml
+build_metadata.AdditionalFiles.TargetPath = Accounting\TrialBalancePage.xaml
+build_metadata.AdditionalFiles.RelativePath = Accounting\TrialBalancePage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/App.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.App.xaml
+build_metadata.AdditionalFiles.TargetPath = App.xaml
+build_metadata.AdditionalFiles.RelativePath = App.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/AppShell.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.AppShell.xaml
+build_metadata.AdditionalFiles.TargetPath = AppShell.xaml
+build_metadata.AdditionalFiles.RelativePath = AppShell.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/BackOffice/BackOfficePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.BackOffice.BackOfficePage.xaml
+build_metadata.AdditionalFiles.TargetPath = BackOffice\BackOfficePage.xaml
+build_metadata.AdditionalFiles.RelativePath = BackOffice\BackOfficePage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Auth/LoginPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Auth.LoginPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Auth\LoginPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Auth\LoginPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/CashSessions/CashSessionPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.CashSessions.CashSessionPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\CashSessions\CashSessionPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\CashSessions\CashSessionPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Catalog/PosPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Catalog.PosPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Catalog\PosPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Catalog\PosPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Checkout/CheckoutPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Checkout.CheckoutPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Checkout\CheckoutPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Checkout\CheckoutPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Dashboard/DashboardPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Dashboard.DashboardPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Dashboard\DashboardPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Dashboard\DashboardPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Hubs/AccountsHubPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Hubs.AccountsHubPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Hubs\AccountsHubPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Hubs\AccountsHubPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Hubs/AuditHubPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Hubs.AuditHubPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Hubs\AuditHubPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Hubs\AuditHubPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Hubs/InventoryHubPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Hubs.InventoryHubPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Hubs\InventoryHubPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Hubs\InventoryHubPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Hubs/PurchasingHubPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Hubs.PurchasingHubPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Hubs\PurchasingHubPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Hubs\PurchasingHubPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Hubs/QcHubPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Hubs.QcHubPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Hubs\QcHubPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Hubs\QcHubPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Hubs/SellHubPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Hubs.SellHubPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Hubs\SellHubPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Hubs\SellHubPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Hubs/SettingsHubPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Hubs.SettingsHubPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Hubs\SettingsHubPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Hubs\SettingsHubPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Hub/HubPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Hub.HubPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Hub\HubPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Hub\HubPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Register/RegisterPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Register.RegisterPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Register\RegisterPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Register\RegisterPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Features/Reports/ReportsPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Features.Reports.ReportsPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Features\Reports\ReportsPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Features\Reports\ReportsPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/InventoryOps/InventoryOpsPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.InventoryOps.InventoryOpsPage.xaml
+build_metadata.AdditionalFiles.TargetPath = InventoryOps\InventoryOpsPage.xaml
+build_metadata.AdditionalFiles.RelativePath = InventoryOps\InventoryOpsPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Procurement/ProcurementPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Procurement.ProcurementPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Procurement\ProcurementPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Procurement\ProcurementPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Rbac/RbacExplorerPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Rbac.RbacExplorerPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Rbac\RbacExplorerPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Rbac\RbacExplorerPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Refunds/RefundsPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Refunds.RefundsPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Refunds\RefundsPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Refunds\RefundsPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Resources/Styles/Colors.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Resources.Styles.Colors.xaml
+build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Colors.xaml
+build_metadata.AdditionalFiles.RelativePath = Resources\Styles\Colors.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/Resources/Styles/Styles.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.Resources.Styles.Styles.xaml
+build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Styles.xaml
+build_metadata.AdditionalFiles.RelativePath = Resources\Styles\Styles.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/DELL/GreenRetail/SecurityOps/SecurityPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = GreenRetail.SecurityOps.SecurityPage.xaml
+build_metadata.AdditionalFiles.TargetPath = SecurityOps\SecurityPage.xaml
+build_metadata.AdditionalFiles.RelativePath = SecurityOps\SecurityPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 

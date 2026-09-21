@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.SecurityOps"
+             x:Class="GreenRetail.SecurityOps.SecurityPage"
+             x:DataType="vm:SecurityViewModel"
+             Title="Security Verification">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16">
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="Gray" />
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Recent Sales / Receipts"
+                           FontAttributes="Bold" />
+
+                    <Button Text="Refresh Recent Sales"
+                            Command="{Binding RefreshRecentSalesCommand}" />
+
+                    <CollectionView ItemsSource="{Binding RecentSales}"
+                                    SelectedItem="{Binding SelectedSale}"
+                                    SelectionMode="Single"
+                                    HeightRequest="180">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RecentSaleListItem">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Padding="4">
+                                    <Label Text="{Binding Created}" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Total}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding CashierName}"
+                                           Margin="8,0" />
+                                    <Label Grid.Column="3"
+                                           Text="{Binding ItemCount}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Label Text="{Binding SelectedSaleText}"
+                           FontAttributes="Italic" />
+
+                    <Button Text="Verify Selected Receipt"
+                            Command="{Binding VerifySelectedReceiptCommand}" />
+
+                    <Label Text="{Binding VerificationResultText}"
+                           FontAttributes="Bold" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Report Security Incident"
+                           FontAttributes="Bold" />
+
+                    <Entry Text="{Binding IncidentType}"
+                           Placeholder="Incident type, e.g. ReceiptMismatch" />
+
+                    <Entry Text="{Binding IncidentDetails}"
+                           Placeholder="Incident details" />
+
+                    <Button Text="Report Incident"
+                            Command="{Binding ReportIncidentCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

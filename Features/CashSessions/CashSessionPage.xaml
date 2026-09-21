@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Features.CashSessions"
+             x:Class="GreenRetail.Features.CashSessions.CashSessionPage"
+             x:DataType="vm:CashSessionViewModel"
+             Title="Cash Session">
+
+    <Grid Padding="24">
+
+        <VerticalStackLayout WidthRequest="420"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Spacing="12">
+
+            <Label Text="Cash Session"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="{Binding SessionStatus}"
+                   FontSize="16" />
+
+            <Entry Text="{Binding OpeningCashInput}"
+                   Keyboard="Numeric"
+                   Placeholder="Opening cash" />
+
+            <Button Text="Open Cash Session"
+                    Command="{Binding OpenSessionCommand}" />
+
+            <Label Text="{Binding ExpectedCash, StringFormat='Expected Cash: {0}'}"
+                   FontSize="18" />
+
+            <Entry Text="{Binding CountedCashInput}"
+                   Keyboard="Numeric"
+                   Placeholder="Counted cash" />
+
+            <Button Text="Close Cash Session"
+                    Command="{Binding CloseSessionCommand}" />
+
+            <Label Text="{Binding Variance, StringFormat='Variance: {0}'}"
+                   FontSize="18" />
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="Gray" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>
