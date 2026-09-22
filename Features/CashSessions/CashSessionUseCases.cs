@@ -14,22 +14,19 @@ public interface IGetActiveSessionQuery : IUseCase<Guid, Result<CashSession?>> {
 public sealed class GetActiveSessionQuery : IGetActiveSessionQuery
 {
     private readonly IDbContextFactory<PosDbContext> _dbFactory;
-    public GetActiveSessionQuery(IDbContextFactory<PosDbContext> dbFactory) => _dbFactory = dbFactory;
+
+    public GetActiveSessionQuery(IDbContextFactory<PosDbContext> dbFactory)
+        => _dbFactory = dbFactory;
 
     public async Task<Result<CashSession?>> ExecuteAsync(Guid terminalId, CancellationToken ct = default)
     {
-        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
-            return Result<CashSession>.Fail("You must be signed in to close the register.");
-
-        if (_currentUser.Role is not ("Manager" or "Owner"))
-            return Result<CashSession>.Fail("Only a Manager or Owner can close the register.");
-
-        if (cmd.CountedCashKobo < 0)
-            return Result<CashSession>.Fail("Counted cash cannot be negative.");
-
         await using var db = await _dbFactory.CreateDbContextAsync(ct);
+
         var session = await db.CashSessions
-            .FirstOrDefaultAsync(x => x.TerminalId == terminalId && x.Status == CashSessionStatus.Open, ct);
+            .FirstOrDefaultAsync(
+                x => x.TerminalId == terminalId && x.Status == CashSessionStatus.Open,
+                ct);
+
         return Result<CashSession?>.Ok(session);
     }
 }
