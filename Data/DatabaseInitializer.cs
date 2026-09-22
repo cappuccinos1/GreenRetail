@@ -30,10 +30,17 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
+        // Some earlier development builds could leave a SQLite file behind that
+        // was created with EnsureCreated or with an incomplete schema. In that
+        // state EF can open the database but authentication immediately fails
+        // with "no such table: Users". A database missing the Users table is not
+        // a usable GreenRetail database, so archive it and rebuild from the
+        // authoritative migrations. Test data is explicitly non-production data.
+        await RepairLegacyDatabaseIfNeededAsync(cancellationToken);
+
         await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        // Use MigrateAsync so the schema is always driven by migrations.
-        // This keeps the app consistent with `dotnet ef database update`.
+        // The schema is migration-owned. Never fall back to EnsureCreated.
         await db.Database.MigrateAsync(cancellationToken);
 
         await SeedUsersAsync(db, cancellationToken);
@@ -47,6 +54,60 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
             await SeedTerminalAsync(db, cancellationToken);
             await SeedCatalogAsync(db, cancellationToken);
             await EnsureDevCredentialsAsync(db, cancellationToken);
+        }
+    }
+
+    private async Task RepairLegacyDatabaseIfNeededAsync(CancellationToken cancellationToken)
+    {
+        var dbPath = DataModule.GetDatabasePath();
+        if (!File.Exists(dbPath))
+            return;
+
+        var hasInvalidSchema = false;
+        await using (var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken))
+        {
+            var tableNames = await db.Database.SqlQueryRaw<string>(
+                "SELECT name AS Value FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+                .ToListAsync(cancellationToken);
+
+            hasInvalidSchema = tableNames.Count > 0 &&
+                               !tableNames.Contains("Users", StringComparer.OrdinalIgnoreCase);
+
+            if (hasInvalidSchema)
+                await db.Database.CloseConnectionAsync();
+        }
+
+        if (!hasInvalidSchema)
+            return;
+
+        // The file contains some schema but not the authentication table. It is
+        // structurally invalid for this build. Preserve it for diagnostics, then
+        // let EF recreate the database from migrations.
+        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        var backupPath = Path.Combine(
+            Path.GetDirectoryName(dbPath)!,
+            $"greenretail.invalid-schema-{timestamp}.db");
+
+        File.Move(dbPath, backupPath, overwrite: false);
+        DeleteIfExists(dbPath + "-wal");
+        DeleteIfExists(dbPath + "-shm");
+
+        var logPath = Path.Combine(Path.GetDirectoryName(dbPath)!, "database-repair.log");
+        await File.AppendAllTextAsync(
+            logPath,
+            $"[{DateTime.UtcNow:O}] Rebuilt database because Users table was missing. Archived: {backupPath}{Environment.NewLine}",
+            cancellationToken);
+    }
+
+    private static void DeleteIfExists(string path)
+    {
+        try
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+        catch
+        {
+            // Best effort; SQLite/Windows may already have released the sidecar.
         }
     }
 

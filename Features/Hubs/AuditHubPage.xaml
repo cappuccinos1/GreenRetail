@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GreenRetail.Features.Hubs.AuditHubPage"
-             Title="Audit" BackgroundColor="#F3F4F6">
-    <Grid Padding="30">
-        <Label Text="AUDIT HUB: Corrections, Authenticity, Logs, Security" FontSize="24" FontAttributes="Bold" TextColor="#1F2937" VerticalOptions="Center" HorizontalOptions="Center"/>
-    </Grid>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.AuditHubPage" Title="Audit" BackgroundColor="#F3F4F6">
+    <ScrollView><VerticalStackLayout Padding="28" Spacing="18">
+        <Label Text="Audit &amp; Security" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+        <Label Text="Evidence, receipt verification, incidents and controlled recommendations" FontSize="16" TextColor="#6B7280" />
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+            <Button Text="Security Verification" Clicked="OnSecurityClicked" HeightRequest="90" />
+            <Button Grid.Column="1" Text="RBAC / Access Review" Clicked="OnRbacClicked" HeightRequest="90" />
+        </Grid>
+        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><Label Text="Audit recommends and investigates; it does not execute operational changes. Security can verify receipts and create incidents." TextColor="#6B7280" /></Border>
+    </VerticalStackLayout></ScrollView>
 </ContentPage>

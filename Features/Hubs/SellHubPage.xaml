@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GreenRetail.Features.Hubs.SellHubPage"
-             Title="Sell" BackgroundColor="#F3F4F6">
-    <Grid Padding="30">
-        <Label Text="SELL HUB: Dense Register, Till, Drawer, Receipts" FontSize="24" FontAttributes="Bold" TextColor="#1F2937" VerticalOptions="Center" HorizontalOptions="Center"/>
-    </Grid>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.SellHubPage" Title="Sell" BackgroundColor="#F3F4F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="28" Spacing="18">
+            <Label Text="Sell" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+            <Label Text="Point of sale, till control and customer transactions" FontSize="16" TextColor="#6B7280" />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
+                <Button Text="Open Register" Clicked="OnRegisterClicked" HeightRequest="90" />
+                <Button Grid.Column="1" Text="Till Management" Clicked="OnCashClicked" HeightRequest="90" />
+                <Button Grid.Row="1" Text="Refunds" Clicked="OnRefundsClicked" HeightRequest="90" />
+                <Button Grid.Row="1" Grid.Column="1" Text="Receipt / Security" Clicked="OnSecurityClicked" HeightRequest="90" />
+            </Grid>
+            <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Operating rule" FontAttributes="Bold" FontSize="16" />
+                    <Label Text="Cashiers sell through the register; Cashier Managers control tills and refunds. The underlying use cases enforce permissions even if a user reaches a screen directly." TextColor="#6B7280" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

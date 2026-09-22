@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GreenRetail.Features.Hubs.QcHubPage"
-             Title="Quality Control" BackgroundColor="#F3F4F6">
-    <Grid Padding="30">
-        <Label Text="QC HUB: Receiving, Inspections, Batches, Expiry" FontSize="24" FontAttributes="Bold" TextColor="#1F2937" VerticalOptions="Center" HorizontalOptions="Center"/>
-    </Grid>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.QcHubPage" Title="Quality Control" BackgroundColor="#F3F4F6">
+    <ScrollView><VerticalStackLayout Padding="28" Spacing="18">
+        <Label Text="Quality Control" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+        <Label Text="Inspect every incoming product before it becomes stock" FontSize="16" TextColor="#6B7280" />
+        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="20">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Receiving → QC → Staging → Inventory" FontSize="20" FontAttributes="Bold" />
+                <Label Text="QC records delivered, accepted and rejected quantities, expiry and batch information. QC never writes StockLevels directly." TextColor="#6B7280" />
+                <Button Text="Open Receiving &amp; QC" Clicked="OnReceivingClicked" />
+            </VerticalStackLayout>
+        </Border>
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+            <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><VerticalStackLayout><Label Text="Accepted" FontSize="18" FontAttributes="Bold"/><Label Text="Ready for Inventory posting" TextColor="#6B7280"/></VerticalStackLayout></Border>
+            <Border Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><VerticalStackLayout><Label Text="Rejected" FontSize="18" FontAttributes="Bold"/><Label Text="Returned to vendor at receiving" TextColor="#6B7280"/></VerticalStackLayout></Border>
+        </Grid>
+    </VerticalStackLayout></ScrollView>
 </ContentPage>

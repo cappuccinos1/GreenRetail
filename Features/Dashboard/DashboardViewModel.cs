@@ -31,6 +31,12 @@ public partial class DashboardViewModel : ObservableObject
 
     public ObservableCollection<DashboardTile> Tiles { get; } = new();
 
+    [ObservableProperty]
+    private string emptyStateMessage = string.Empty;
+
+    [ObservableProperty]
+    private string initializationError = string.Empty;
+
     public DashboardViewModel(INavigationService navigation, ICurrentUserService currentUser, IAuthorizationService authorization)
     {
         _navigation = navigation;
@@ -40,11 +46,13 @@ public partial class DashboardViewModel : ObservableObject
 
     public async Task InitializeAsync()
     {
+        InitializationError = string.Empty;
         UserName = _currentUser.DisplayName ?? "User";
         Role = _currentUser.Role ?? "None";
         Greeting = $"Welcome back, {UserName}";
 
         Tiles.Clear();
+        EmptyStateMessage = string.Empty;
 
         // Define all possible workspace tiles
         var allTiles = new List<DashboardTile>
@@ -60,7 +68,11 @@ public partial class DashboardViewModel : ObservableObject
             new("System Setup", "Create branches and POS terminals", "settings.png", "system-setup", "#0F766E")
         };
 
-        if (!_currentUser.UserId.HasValue) return;
+        if (!_currentUser.UserId.HasValue)
+        {
+            EmptyStateMessage = "Your session is not authenticated. Return to the login screen.";
+            return;
+        }
 
         var userId = _currentUser.UserId.Value;
         var allowed = new[]
@@ -76,10 +88,23 @@ public partial class DashboardViewModel : ObservableObject
             new[] { PermissionCodes.ItSystemManage }
         };
 
-        for (var i = 0; i < allTiles.Count; i++)
+        try
         {
-            if (await _authorization.HasAnyPermissionAsync(userId, allowed[i], cancellationToken: CancellationToken.None))
-                Tiles.Add(allTiles[i]);
+            for (var i = 0; i < allTiles.Count; i++)
+            {
+                if (await _authorization.HasAnyPermissionAsync(userId, allowed[i], cancellationToken: CancellationToken.None))
+                    Tiles.Add(allTiles[i]);
+            }
+        }
+        catch (Exception ex)
+        {
+            InitializationError = "Workspace permissions could not be loaded. The database may need repair or the account may not have an implemented role.";
+            App.LogCrash(ex);
+        }
+
+        if (Tiles.Count == 0 && string.IsNullOrWhiteSpace(InitializationError))
+        {
+            EmptyStateMessage = "No workspace permissions are assigned to this account yet. An IT/HR administrator must implement the user's role and branch assignment.";
         }
     }
 

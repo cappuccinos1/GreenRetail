@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GreenRetail.Features.Hubs.SettingsHubPage"
-             Title="Settings" BackgroundColor="#F3F4F6">
-    <Grid Padding="30">
-        <Label Text="SETTINGS HUB: Users, Branches, Devices, Setup" FontSize="24" FontAttributes="Bold" TextColor="#1F2937" VerticalOptions="Center" HorizontalOptions="Center"/>
-    </Grid>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.SettingsHubPage" Title="Settings" BackgroundColor="#F3F4F6">
+    <ScrollView><VerticalStackLayout Padding="28" Spacing="18">
+        <Label Text="Settings &amp; Administration" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+        <Label Text="System setup, access administration and controlled configuration" FontSize="16" TextColor="#6B7280" />
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
+            <Button Text="System Setup" Clicked="OnSetupClicked" HeightRequest="90" />
+            <Button Grid.Column="1" Text="Roles &amp; Permissions" Clicked="OnRbacClicked" HeightRequest="90" />
+            <Button Grid.Row="1" Text="Change Password" Clicked="OnPasswordClicked" HeightRequest="90" />
+            <Button Grid.Row="1" Grid.Column="1" Text="System Diagnostics" Clicked="OnSetupClicked" HeightRequest="90" />
+        </Grid>
+        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><Label Text="HR requests users and role changes; IT creates logins and implements access. Sensitive role changes can be subject to dual approval." TextColor="#6B7280" /></Border>
+    </VerticalStackLayout></ScrollView>
 </ContentPage>

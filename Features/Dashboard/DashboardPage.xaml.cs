@@ -21,6 +21,15 @@ public partial class DashboardPage : ContentPage
 }
 
 // Simple converter to get the first letter of a string for the icon box
+public class StringNotEmptyConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is string s && !string.IsNullOrWhiteSpace(s);
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 public class FirstLetterConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

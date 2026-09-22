@@ -20,10 +20,10 @@ public static class DataModule
 
     public static string GetConnectionString()
     {
-        return $"Data Source={GetDbPath()}";
+        return $"Data Source={GetDatabasePath()}";
     }
 
-    private static string GetDbPath()
+    public static string GetDatabasePath()
     {
         var dir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

@@ -8,7 +8,8 @@
        FlyoutBehavior="Flyout"
        FlyoutWidth="280"
        Shell.NavBarIsVisible="False"
-       Shell.FlyoutBackgroundColor="#111827">
+       Shell.FlyoutBackgroundColor="#111827"
+       Navigated="OnShellNavigated">
 
     <Shell.Resources>
         <ResourceDictionary>
@@ -21,6 +22,7 @@
             
             <!-- Register the converter globally -->
             <dashboard:FirstLetterConverter x:Key="FirstLetterConverter" />
+            <dashboard:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
         </ResourceDictionary>
     </Shell.Resources>
 

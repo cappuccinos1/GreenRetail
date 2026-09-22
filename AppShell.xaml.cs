@@ -10,11 +10,14 @@ using GreenRetail.Rbac;
 using GreenRetail.Refunds;
 using GreenRetail.SecurityOps;
 using GreenRetail.Features.Setup;
+using GreenRetail.Shared.State;
 
 namespace GreenRetail;
 
 public partial class AppShell : Shell
 {
+    private bool _redirecting;
+
     public AppShell()
     {
         InitializeComponent();
@@ -36,5 +39,29 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("trial-balance", typeof(TrialBalancePage));
         Routing.RegisterRoute("rbac-explorer", typeof(RbacExplorerPage));
         Routing.RegisterRoute("system-setup", typeof(SetupPage));
+
+        Dispatcher.Dispatch(async () =>
+        {
+            if (Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(ICurrentUserService)) is ICurrentUserService currentUser
+                && !currentUser.IsAuthenticated)
+            {
+                await GoToAsync("//login");
+            }
+        });
+    }
+
+    private async void OnShellNavigated(object? sender, ShellNavigatedEventArgs e)
+    {
+        if (_redirecting) return;
+
+        var currentUser = Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(ICurrentUserService)) as ICurrentUserService;
+        if (currentUser is null || currentUser.IsAuthenticated) return;
+
+        var location = e.Current?.Location?.OriginalString ?? string.Empty;
+        if (location.Contains("/login", StringComparison.OrdinalIgnoreCase)) return;
+
+        _redirecting = true;
+        try { await GoToAsync("//login"); }
+        finally { _redirecting = false; }
     }
 }

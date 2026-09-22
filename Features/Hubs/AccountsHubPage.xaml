@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GreenRetail.Features.Hubs.AccountsHubPage"
-             Title="Accounts" BackgroundColor="#F3F4F6">
-    <Grid Padding="30">
-        <Label Text="ACCOUNTS HUB: Daybook, Expenses, P&amp;L, AP/AR" FontSize="24" FontAttributes="Bold" TextColor="#1F2937" VerticalOptions="Center" HorizontalOptions="Center"/>
-    </Grid>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.AccountsHubPage" Title="Accounts" BackgroundColor="#F3F4F6">
+    <ScrollView><VerticalStackLayout Padding="28" Spacing="18">
+        <Label Text="Accounts &amp; Finance" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+        <Label Text="Cash control, financial statements, reconciliations and accounting" FontSize="16" TextColor="#6B7280" />
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
+            <Button Text="Trial Balance" Clicked="OnTrialBalanceClicked" HeightRequest="90" />
+            <Button Grid.Column="1" Text="Sales Reports" Clicked="OnReportsClicked" HeightRequest="90" />
+            <Button Grid.Row="1" Text="Cash Sessions" Clicked="OnCashClicked" HeightRequest="90" />
+            <Button Grid.Row="1" Grid.Column="1" Text="Reconciliation" Clicked="OnTrialBalanceClicked" HeightRequest="90" />
+        </Grid>
+        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><Label Text="Cash counts are blind and Accounts approves variances. Deposits remain an Accounts responsibility." TextColor="#6B7280" /></Border>
+    </VerticalStackLayout></ScrollView>
 </ContentPage>
