@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Application xmlns:converters="clr-namespace:GreenRetail.Features.Setup" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<Application xmlns:converters="clr-namespace:GreenRetail.Features.Setup" xmlns:dashboard="clr-namespace:GreenRetail.Features.Dashboard" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GreenRetail.App">
     <Application.Resources>
         <ResourceDictionary>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:InverseBoolConverter x:Key="InvertedBoolConverter" />
+            <dashboard:FirstLetterConverter x:Key="FirstLetterConverter" />
+            <dashboard:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -32,12 +32,12 @@ public static class PermissionCodes
     public const string PurchasingPoCreate = "purchasing.po.create";
     public const string PurchasingPoView = "purchasing.po.view";
 
-    // Receiving / QC. QC never writes stock directly.
+    // Receiving / Quality Control. Quality Control never writes stock directly.
     public const string ReceivingGrnPost = "receiving.grn.post";
     public const string ReceivingInvoiceWithoutPo = "receiving.invoice_without_po";
     public const string ReceivingNoPoConfirm = "receiving.no_po.confirm";
-    public const string QcInspect = "qc.inspect";
-    public const string QcApprove = "qc.approve";
+    public const string QualityControlInspect = "quality_control.inspect";
+    public const string QualityControlApprove = "quality_control.approve";
 
     // Cash / accounts
     public const string CashCount = "cash.count";
@@ -83,7 +83,7 @@ public static class PermissionCodes
         InventoryNegativeStockAllow, InventoryQuarantineManage,
         PurchasingPoCreate, PurchasingPoView,
         ReceivingGrnPost, ReceivingInvoiceWithoutPo, ReceivingNoPoConfirm,
-        QcInspect, QcApprove,
+        QualityControlInspect, QualityControlApprove,
         CashCount, CashVarianceApprove, CashDepositRecord,
         FinanceView, FinanceStatementPrepare, FinanceOrganisationStatementPrepare,
         ReportsCashierPerformanceView, ReportsSalesView,
@@ -108,8 +108,8 @@ public static class RoleNames
     public const string InventoryHead = "InventoryHead";
     public const string Buyer = "Buyer";
     public const string ProcurementHead = "ProcurementHead";
-    public const string QCOfficer = "QCOfficer";
-    public const string QCHead = "QCHead";
+    public const string QualityControlOfficer = "QualityControlOfficer";
+    public const string QualityControlHead = "QualityControlHead";
     public const string AccountsOfficer = "AccountsOfficer";
     public const string AccountsHead = "AccountsHead";
     public const string AccountsGroupHead = "AccountsGroupHead";

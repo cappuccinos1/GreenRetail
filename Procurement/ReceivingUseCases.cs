@@ -48,10 +48,10 @@ public sealed class StartReceivingUseCase : IStartReceivingUseCase
     {
         if (!await _authorization.HasPermissionAsync(
                 command.ReceivedByUserId,
-                PermissionCodes.QcInspect,
+                PermissionCodes.QualityControlInspect,
                 command.BranchId,
                 cancellationToken))
-            return Result<ReceivingResult>.Fail("You are not authorized to start receiving/QC.", ResultErrorCode.Authorization);
+            return Result<ReceivingResult>.Fail("You are not authorized to start receiving / Quality Control.", ResultErrorCode.Authorization);
 
         if (!command.PurchaseOrderId.HasValue && !await _authorization.HasPermissionAsync(
                 command.ReceivedByUserId,
@@ -163,7 +163,7 @@ public sealed class StartReceivingUseCase : IStartReceivingUseCase
     }
 }
 
-public sealed record CompleteQcLineInput(
+public sealed record CompleteQualityControlLineInput(
     Guid ReceivingLineId,
     decimal AcceptedQuantity,
     decimal RejectedQuantity,
@@ -171,21 +171,21 @@ public sealed record CompleteQcLineInput(
     DateTime ExpiryUtc,
     string? BatchNumber);
 
-public sealed record CompleteQcCommand(
+public sealed record CompleteQualityControlCommand(
     Guid ReceivingSessionId,
     Guid InspectorUserId,
-    IReadOnlyList<CompleteQcLineInput> Lines);
+    IReadOnlyList<CompleteQualityControlLineInput> Lines);
 
-public interface ICompleteQcUseCase
-    : IUseCase<CompleteQcCommand, Result<ReceivingResult>>;
+public interface ICompleteQualityControlUseCase
+    : IUseCase<CompleteQualityControlCommand, Result<ReceivingResult>>;
 
-public sealed class CompleteQcUseCase : ICompleteQcUseCase
+public sealed class CompleteQualityControlUseCase : ICompleteQualityControlUseCase
 {
     private readonly IDbContextFactory<PosDbContext> _dbContextFactory;
     private readonly IAuthorizationService _authorization;
     private readonly IClock _clock;
 
-    public CompleteQcUseCase(
+    public CompleteQualityControlUseCase(
         IDbContextFactory<PosDbContext> dbContextFactory,
         IAuthorizationService authorization,
         IClock clock)
@@ -196,7 +196,7 @@ public sealed class CompleteQcUseCase : ICompleteQcUseCase
     }
 
     public async Task<Result<ReceivingResult>> ExecuteAsync(
-        CompleteQcCommand command,
+        CompleteQualityControlCommand command,
         CancellationToken cancellationToken = default)
     {
         await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
@@ -213,26 +213,26 @@ public sealed class CompleteQcUseCase : ICompleteQcUseCase
 
         if (!await _authorization.HasPermissionAsync(
                 command.InspectorUserId,
-                PermissionCodes.QcInspect,
+                PermissionCodes.QualityControlInspect,
                 receiving.BranchId,
                 cancellationToken))
-            return Result<ReceivingResult>.Fail("You are not authorized to perform QC.", ResultErrorCode.Authorization);
+            return Result<ReceivingResult>.Fail("You are not authorized to perform Quality Control.", ResultErrorCode.Authorization);
 
         if (receiving.Status != ReceivingStatus.InInspection)
-            return Result<ReceivingResult>.Fail("This receiving session is no longer awaiting QC.");
+            return Result<ReceivingResult>.Fail("This receiving session is no longer awaiting Quality Control.");
 
         if (command.Lines.GroupBy(x => x.ReceivingLineId).Any(g => g.Count() > 1))
-            return Result<ReceivingResult>.Fail("A receiving line may be inspected only once in a QC submission.");
+            return Result<ReceivingResult>.Fail("A receiving line may be inspected only once in a Quality Control submission.");
 
         var inputById = command.Lines.ToDictionary(x => x.ReceivingLineId);
         if (inputById.Count != receiving.Lines.Count || receiving.Lines.Any(x => !inputById.ContainsKey(x.Id)))
-            return Result<ReceivingResult>.Fail("QC must inspect every receiving line.");
+            return Result<ReceivingResult>.Fail("Quality Control must inspect every receiving line.");
 
         foreach (var line in receiving.Lines)
         {
             var input = inputById[line.Id];
             if (input.AcceptedQuantity < 0m || input.RejectedQuantity < 0m)
-                return Result<ReceivingResult>.Fail("QC quantities cannot be negative.");
+                return Result<ReceivingResult>.Fail("Quality Control quantities cannot be negative.");
 
             if (input.AcceptedQuantity + input.RejectedQuantity != line.DeliveredQuantity)
                 return Result<ReceivingResult>.Fail("Accepted plus rejected quantity must equal delivered quantity.");
@@ -266,7 +266,7 @@ public sealed class CompleteQcUseCase : ICompleteQcUseCase
         {
             UserId = command.InspectorUserId,
             CreatedUtc = now,
-            Action = "receiving.qc.completed",
+            Action = "receiving.quality_control.completed",
             Details = $"Receiving {receiving.Number} inspected. Accepted={receiving.Lines.Sum(x => x.AcceptedQuantity):0.###}; rejected={receiving.Lines.Sum(x => x.RejectedQuantity):0.###}."
         });
 
@@ -379,7 +379,7 @@ public sealed class PostReceivingGrnUseCase : IPostReceivingGrnUseCase
             return Result<GrnResult>.Fail("You are not authorized to post received stock.", ResultErrorCode.Authorization);
 
         if (receiving.Status != ReceivingStatus.ReadyForPosting)
-            return Result<GrnResult>.Fail("Only QC-completed receiving sessions can be posted.");
+            return Result<GrnResult>.Fail("Only Quality Control-completed receiving sessions can be posted.");
 
         if (!receiving.PurchaseOrderId.HasValue && receiving.NoPoBuyerConfirmedByUserId is null)
             return Result<GrnResult>.Fail("A no-PO receiving transaction must be confirmed by a buying officer before posting.");

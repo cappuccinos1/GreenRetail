@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GreenRetail.Procurement"
+             x:Class="GreenRetail.Procurement.QualityControlPage"
+             x:Name="RootPage"
+             x:DataType="vm:QualityControlViewModel"
+             Title="Receiving &amp; Quality Control"
+             BackgroundColor="#F3F4F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Label Text="Receiving &amp; Quality Control" FontSize="30" FontAttributes="Bold" TextColor="#111827" />
+            <Label Text="Every incoming product is inspected. Accepted goods are staged for Inventory; Quality Control never posts stock." TextColor="#6B7280" />
+            <Label Text="{Binding StatusMessage}" TextColor="#374151" />
+
+            <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="1. Start receiving" FontSize="20" FontAttributes="Bold" />
+                    <Picker Title="Receiving branch" ItemsSource="{Binding Branches}" SelectedItem="{Binding SelectedBranch}" />
+                    <Picker Title="Supplier" ItemsSource="{Binding Suppliers}" SelectedItem="{Binding SelectedSupplier}" ItemDisplayBinding="{Binding Name}" />
+                    <Picker Title="Purchase order (optional for open-market purchase)" ItemsSource="{Binding PurchaseOrders}" SelectedItem="{Binding SelectedPurchaseOrder}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Entry Placeholder="Vendor invoice number" Text="{Binding VendorInvoiceNumber}" />
+                        <Entry Grid.Column="1" Placeholder="Invoice date yyyy-MM-dd" Text="{Binding VendorInvoiceDate}" />
+                    </Grid>
+                    <Entry Placeholder="Notes" Text="{Binding Notes}" />
+
+                    <Label Text="Find product" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Placeholder="Product name or SKU" Text="{Binding ProductSearch}" />
+                        <Button Grid.Column="1" Text="Search" Command="{Binding SearchProductsCommand}" />
+                    </Grid>
+                    <Picker Title="Product" ItemsSource="{Binding Products}" SelectedItem="{Binding SelectedProduct}" ItemDisplayBinding="{Binding Name}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Entry Placeholder="Delivered quantity" Keyboard="Numeric" Text="{Binding DraftQuantity}" />
+                        <Entry Grid.Column="1" Placeholder="Unit cost (₦)" Keyboard="Numeric" Text="{Binding DraftUnitCostNaira}" />
+                    </Grid>
+                    <Button Text="Add product line" Command="{Binding AddReceivingLineCommand}" />
+                    <CollectionView ItemsSource="{Binding DraftLines}" HeightRequest="160" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ReceivingDraftLine">
+                                <Grid ColumnDefinitions="*,Auto,Auto" Padding="6">
+                                    <Label Text="{Binding ProductName}" />
+                                    <Label Grid.Column="1" Text="{Binding DeliveredQuantity}" Margin="12,0" />
+                                    <Button Grid.Column="2" Text="Remove" Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.RemoveReceivingLineCommand}" CommandParameter="{Binding .}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Text="Start receiving" Command="{Binding StartReceivingCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18" IsVisible="{Binding HasActiveReceiving}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="2. Quality Control inspection" FontSize="20" FontAttributes="Bold" />
+                    <Label Text="{Binding ActiveReceivingNumber, StringFormat='Receiving: {0}'}" FontAttributes="Bold" />
+                    <Label Text="Accepted + rejected must equal delivered. Expiry is mandatory; batch is mandatory where the product requires it." TextColor="#6B7280" />
+                    <CollectionView ItemsSource="{Binding InspectionLines}" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:QualityControlLineEditor">
+                                <Border Stroke="#E5E7EB" Padding="12" Margin="0,4">
+                                    <VerticalStackLayout Spacing="8">
+                                        <Label Text="{Binding ProductName}" FontAttributes="Bold" />
+                                        <Label Text="{Binding DeliveredQuantity, StringFormat='Delivered: {0}'}" TextColor="#6B7280" />
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                            <Entry Placeholder="Accepted" Keyboard="Numeric" Text="{Binding AcceptedQuantity}" />
+                                            <Entry Grid.Column="1" Placeholder="Rejected" Keyboard="Numeric" Text="{Binding RejectedQuantity}" />
+                                        </Grid>
+                                        <Entry Placeholder="Rejection reason (required if rejected)" Text="{Binding RejectReason}" />
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                            <Entry Placeholder="Expiry yyyy-MM-dd" Text="{Binding ExpiryDate}" />
+                                            <Entry Grid.Column="1" Placeholder="Batch number if required" Text="{Binding BatchNumber}" />
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Text="Confirm No-PO" Command="{Binding ConfirmNoPoCommand}" />
+                        <Button Grid.Column="1" Text="Complete Quality Control" Command="{Binding CompleteQualityControlCommand}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border BackgroundColor="#ECFDF5" Stroke="#A7F3D0" Padding="16">
+                <Label Text="Control boundary: Quality Control does not write StockLevels or StockLedger. Inventory posts the accepted GRN after Quality Control is complete." TextColor="#065F46" />
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -209,9 +209,9 @@ public sealed class PostGrnUseCase : IPostGrnUseCase
         CancellationToken cancellationToken = default)
     {
         // Source-compatible guard for the old UI contract. Direct GRN posting is
-        // intentionally disabled so QC cannot bypass the receiving staging boundary.
+        // intentionally disabled so Quality Control cannot bypass the receiving staging boundary.
         return Task.FromResult(Result<GrnResult>.Fail(
-            "Direct GRN posting is disabled. Goods must pass through receiving and QC staging before Inventory posts the GRN.",
+            "Direct GRN posting is disabled. Goods must pass through receiving and Quality Control staging before Inventory posts the GRN.",
             ResultErrorCode.BusinessRule));
     }
 }

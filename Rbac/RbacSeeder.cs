@@ -20,6 +20,7 @@ public static class RbacSeeder
         await ReconcileSystemRolePermissionsAsync(db, cancellationToken);
         await EnsureOwnerRoleAsync(db, now, cancellationToken);
         await MigrateLegacyItRoleAsync(db, now, cancellationToken);
+        await MigrateLegacyQualityControlRolesAsync(db, now, cancellationToken);
     }
 
     private static async Task EnsurePermissionsAsync(PosDbContext db, DateTime now, CancellationToken ct)
@@ -55,8 +56,8 @@ public static class RbacSeeder
             RoleNames.InventoryHead,
             RoleNames.Buyer,
             RoleNames.ProcurementHead,
-            RoleNames.QCOfficer,
-            RoleNames.QCHead,
+            RoleNames.QualityControlOfficer,
+            RoleNames.QualityControlHead,
             RoleNames.AccountsOfficer,
             RoleNames.AccountsHead,
             RoleNames.AccountsGroupHead,
@@ -170,9 +171,9 @@ public static class RbacSeeder
             PermissionCodes.ReceivingNoPoConfirm
         },
 
-        // QC inspects; it never writes stock. Inventory posts the accepted GRN.
-        [RoleNames.QCOfficer] = new[] { PermissionCodes.QcInspect, PermissionCodes.ReceivingInvoiceWithoutPo },
-        [RoleNames.QCHead] = new[] { PermissionCodes.QcInspect, PermissionCodes.QcApprove, PermissionCodes.ReceivingInvoiceWithoutPo },
+        // Quality Control inspects; it never writes stock. Inventory posts the accepted GRN.
+        [RoleNames.QualityControlOfficer] = new[] { PermissionCodes.QualityControlInspect, PermissionCodes.ReceivingInvoiceWithoutPo },
+        [RoleNames.QualityControlHead] = new[] { PermissionCodes.QualityControlInspect, PermissionCodes.QualityControlApprove, PermissionCodes.ReceivingInvoiceWithoutPo },
 
         // Cash and financial visibility belong to Accounts.
         [RoleNames.AccountsOfficer] = new[]
@@ -288,4 +289,44 @@ public static class RbacSeeder
         }
         await db.SaveChangesAsync(ct);
     }
+    private static async Task MigrateLegacyQualityControlRolesAsync(PosDbContext db, DateTime now, CancellationToken ct)
+    {
+        // The role names were expanded from QCOfficer/QCHead to the explicit
+        // QualityControl names so the authorization vocabulary matches the
+        // application terminology. Preserve existing assignments.
+        var mappings = new[]
+        {
+            (Legacy: "QCOfficer", Current: RoleNames.QualityControlOfficer),
+            (Legacy: "QCHead", Current: RoleNames.QualityControlHead)
+        };
+
+        foreach (var mapping in mappings)
+        {
+            var legacy = await db.Roles.FirstOrDefaultAsync(x => x.Name == mapping.Legacy, ct);
+            var current = await db.Roles.FirstOrDefaultAsync(x => x.Name == mapping.Current, ct);
+            if (legacy is null || current is null) continue;
+
+            var assignments = await db.UserRoles.Where(x => x.RoleId == legacy.Id).ToListAsync(ct);
+            foreach (var assignment in assignments)
+            {
+                if (await db.UserRoles.AnyAsync(x => x.UserId == assignment.UserId && x.RoleId == current.Id && x.BranchId == assignment.BranchId, ct))
+                    continue;
+
+                db.UserRoles.Add(new UserRole
+                {
+                    UserId = assignment.UserId,
+                    RoleId = current.Id,
+                    BranchId = assignment.BranchId,
+                    AssignedUtc = now
+                });
+
+                var user = await db.Users.FirstOrDefaultAsync(x => x.Id == assignment.UserId, ct);
+                if (user is not null && string.Equals(user.Role, mapping.Legacy, StringComparison.OrdinalIgnoreCase))
+                    user.Role = mapping.Current;
+            }
+        }
+
+        await db.SaveChangesAsync(ct);
+    }
+
 }

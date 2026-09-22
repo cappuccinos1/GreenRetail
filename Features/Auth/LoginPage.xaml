@@ -37,6 +37,12 @@
             <Button Text="Login"
                     Command="{Binding LoginCommand}" />
 
+            <Button Text="Reset test Owner access"
+                    Command="{Binding ResetOwnerAccessCommand}"
+                    IsVisible="{Binding IsDevelopmentRecoveryEnabled}"
+                    BackgroundColor="#FEF3C7"
+                    TextColor="#92400E" />
+
             <ActivityIndicator IsRunning="{Binding IsBusy}"
                                IsVisible="{Binding IsBusy}" />
 

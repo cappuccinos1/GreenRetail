@@ -33,6 +33,7 @@ public partial class AppShell : Shell
         // Back Office Workspaces
         Routing.RegisterRoute("inventory-ops", typeof(InventoryOpsPage));
         Routing.RegisterRoute("procurement", typeof(ProcurementPage));
+        Routing.RegisterRoute("quality-control-workflow", typeof(QualityControlPage));
         Routing.RegisterRoute("refunds", typeof(RefundsPage));
         Routing.RegisterRoute("security", typeof(SecurityPage));
 

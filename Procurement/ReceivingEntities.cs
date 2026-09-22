@@ -11,8 +11,8 @@ public enum ReceivingStatus
 }
 
 /// <summary>
-/// Operational receiving/QC staging record. It is deliberately separate from the
-/// posted GRN so QC can inspect goods without changing inventory balances.
+/// Operational receiving/Quality Control staging record. It is deliberately separate from the
+/// posted GRN so Quality Control can inspect goods without changing inventory balances.
 /// </summary>
 public class ReceivingSession
 {

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.PurchasingHubPage" Title="Purchasing" BackgroundColor="#F3F4F6">
     <ScrollView><VerticalStackLayout Padding="28" Spacing="18">
-        <Label Text="Purchasing &amp; Receiving" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
-        <Label Text="Purchase orders, supplier invoices, receiving and QC staging" FontSize="16" TextColor="#6B7280" />
+        <Label Text="Purchasing" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+        <Label Text="Purchase orders and buyer-controlled purchasing functions" FontSize="16" TextColor="#6B7280" />
         <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
-            <Button Text="Purchase Orders &amp; Receiving" Clicked="OnProcurementClicked" HeightRequest="90" />
-            <Button Grid.Column="1" Text="Quality Control" Clicked="OnQcClicked" HeightRequest="90" />
-            <Button Grid.Row="1" Text="Supplier Records" Clicked="OnProcurementClicked" HeightRequest="90" />
-            <Button Grid.Row="1" Grid.Column="1" Text="Invoice / GRN Workflow" Clicked="OnProcurementClicked" HeightRequest="90" />
+            <Button Text="Purchase Orders" Clicked="OnProcurementClicked" HeightRequest="90" />
+            <Button Grid.Column="1" Text="Active POs" Clicked="OnProcurementClicked" HeightRequest="90" />
+            <Button Grid.Row="1" Text="PO Line Management" Clicked="OnProcurementClicked" HeightRequest="90" />
+            <Button Grid.Row="1" Grid.Column="1" Text="Purchasing History" Clicked="OnProcurementClicked" HeightRequest="90" />
         </Grid>
-        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><Label Text="A vendor invoice is the supplier's financial document. A GRN is GreenRetail's controlled receipt record. QC acceptance happens before inventory posting." TextColor="#6B7280" /></Border>
+        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><Label Text="Purchasing raises and manages purchase orders. Receiving and Quality Control are a separate operational workflow." TextColor="#6B7280" /></Border>
     </VerticalStackLayout></ScrollView>
 </ContentPage>

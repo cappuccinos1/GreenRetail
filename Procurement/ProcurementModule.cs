@@ -10,12 +10,15 @@ public static class ProcurementModule
         services.AddTransient<ICreatePurchaseOrderUseCase, CreatePurchaseOrderUseCase>();
         services.AddTransient<IPostGrnUseCase, PostGrnUseCase>();
         services.AddTransient<IStartReceivingUseCase, StartReceivingUseCase>();
-        services.AddTransient<ICompleteQcUseCase, CompleteQcUseCase>();
+        services.AddTransient<ICompleteQualityControlUseCase, CompleteQualityControlUseCase>();
         services.AddTransient<IConfirmNoPoReceivingUseCase, ConfirmNoPoReceivingUseCase>();
         services.AddTransient<IPostReceivingGrnUseCase, PostReceivingGrnUseCase>();
 
         services.AddTransient<IGetSuppliersQuery, GetSuppliersQuery>();
         services.AddTransient<IGetActivePurchaseOrdersQuery, GetActivePurchaseOrdersQuery>();
+
+        services.AddTransient<QualityControlViewModel>();
+        services.AddTransient<QualityControlPage>();
 
         services.AddTransient<ProcurementViewModel>();
         services.AddTransient<ProcurementPage>();

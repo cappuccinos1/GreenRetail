@@ -5,10 +5,12 @@
              xmlns:catalog="clr-namespace:GreenRetail.Features.Catalog"
              x:Class="GreenRetail.Procurement.ProcurementPage"
              x:DataType="vm:ProcurementViewModel"
-             Title="Procurement / Receiving">
+             Title="Purchasing — Purchase Orders">
 
     <ScrollView Padding="16">
         <VerticalStackLayout Spacing="16">
+
+            <Label Text="Purchasing is for purchase orders. Receiving and Quality Control are handled in the separate Receiving &amp; Quality Control workspace." TextColor="#6B7280" />
 
             <Label Text="{Binding StatusMessage}"
                    TextColor="Gray" />
@@ -47,48 +49,7 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame BorderColor="LightGray">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Suppliers"
-                           FontAttributes="Bold" />
 
-                    <Entry Text="{Binding SupplierName}"
-                           Placeholder="Supplier name" />
-
-                    <Entry Text="{Binding SupplierPhone}"
-                           Placeholder="Phone" />
-
-                    <Entry Text="{Binding SupplierEmail}"
-                           Placeholder="Email" />
-
-                    <Entry Text="{Binding SupplierAddress}"
-                           Placeholder="Address" />
-
-                    <Button Text="Create Supplier"
-                            Command="{Binding CreateSupplierCommand}" />
-
-                    <Button Text="Refresh Suppliers"
-                            Command="{Binding RefreshSuppliersCommand}" />
-
-                    <CollectionView ItemsSource="{Binding Suppliers}"
-                                    SelectedItem="{Binding SelectedSupplier}"
-                                    SelectionMode="Single"
-                                    HeightRequest="140">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="vm:SupplierListItem">
-                                <Grid ColumnDefinitions="*,Auto" Padding="4">
-                                    <Label Text="{Binding Name}" />
-                                    <Label Grid.Column="1"
-                                           Text="{Binding Phone}" />
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-
-                    <Label Text="{Binding SelectedSupplierText}"
-                           FontAttributes="Italic" />
-                </VerticalStackLayout>
-            </Frame>
 
             <Frame BorderColor="LightGray">
                 <VerticalStackLayout Spacing="8">
@@ -162,61 +123,7 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame BorderColor="LightGray">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Receive Goods / GRN"
-                           FontAttributes="Bold" />
 
-                    <Entry Text="{Binding VendorInvoiceNumber}"
-                           Placeholder="Vendor invoice number" />
-
-                    <Entry Text="{Binding VendorInvoiceDateText}"
-                           Placeholder="Vendor invoice date yyyy-MM-dd" />
-
-                    <Entry Text="{Binding GrnAcceptedQuantityText}"
-                           Placeholder="Accepted quantity"
-                           Keyboard="Numeric" />
-
-                    <Entry Text="{Binding GrnRejectedQuantityText}"
-                           Placeholder="Rejected quantity"
-                           Keyboard="Numeric" />
-
-                    <Entry Text="{Binding GrnExpiryText}"
-                           Placeholder="Expiry date yyyy-MM-dd" />
-
-                    <Entry Text="{Binding GrnBatchText}"
-                           Placeholder="Batch number" />
-
-                    <Button Text="Add GRN Line"
-                            Command="{Binding AddGrnLineCommand}" />
-
-                    <CollectionView ItemsSource="{Binding GrnLines}"
-                                    SelectionMode="None"
-                                    HeightRequest="120">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="vm:NewGrnLineItem">
-                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Padding="4">
-                                    <Label Text="{Binding ProductName}" />
-                                    <Label Grid.Column="1"
-                                           Text="{Binding Accepted}"
-                                           Margin="8,0" />
-                                    <Label Grid.Column="2"
-                                           Text="{Binding Rejected}"
-                                           Margin="8,0" />
-                                    <Label Grid.Column="3"
-                                           Text="{Binding Batch}" />
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-
-                    <Entry Text="{Binding GrnNotes}"
-                           Placeholder="GRN notes" />
-
-                    <Button Text="Post GRN"
-                            Command="{Binding PostGrnCommand}" />
-                </VerticalStackLayout>
-            </Frame>
 
         </VerticalStackLayout>
     </ScrollView>

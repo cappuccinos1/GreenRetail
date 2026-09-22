@@ -138,6 +138,31 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <Frame BorderColor="LightGray">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Receiving ready for Inventory posting" FontAttributes="Bold" />
+                    <Label Text="Quality Control has completed these transactions. Inventory is the only role that posts the accepted GRN into stock." TextColor="Gray" />
+                    <Button Text="Refresh ready receiving" Command="{Binding RefreshReadyReceivingCommand}" />
+                    <CollectionView ItemsSource="{Binding ReadyReceivings}" SelectedItem="{Binding SelectedReadyReceiving}" SelectionMode="Single" HeightRequest="180">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ReadyReceivingListItem">
+                                <Grid ColumnDefinitions="*,Auto" Padding="6">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Number}" FontAttributes="Bold" />
+                                        <Label Text="{Binding SupplierName}" />
+                                        <Label Text="{Binding BranchName}" TextColor="Gray" />
+                                        <Label Text="{Binding AcceptedSummary}" TextColor="Gray" />
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1" Text="{Binding VendorInvoiceNumber}" VerticalOptions="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Label Text="{Binding SelectedReadyReceivingText}" FontAttributes="Italic" />
+                    <Button Text="Post accepted GRN to inventory" Command="{Binding PostSelectedReceivingCommand}" />
+                </VerticalStackLayout>
+            </Frame>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

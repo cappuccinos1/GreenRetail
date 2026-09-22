@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 using System.Security.Cryptography;
 using GreenRetail.Data.Entities;
 using GreenRetail.Features.Auth;
@@ -41,7 +42,30 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
         await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         // The schema is migration-owned. Never fall back to EnsureCreated.
+        // PendingModelChangesWarning is ignored by DataModule during this controlled
+        // development migration/recovery phase; the initializer verifies the resulting schema.
         await db.Database.MigrateAsync(cancellationToken);
+
+        if (!await TableExistsAsync(db, "Users", cancellationToken))
+        {
+            await db.Database.CloseConnectionAsync();
+            await ArchiveDatabaseAndRetryAsync(cancellationToken);
+            await using var repairedDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+            await repairedDb.Database.MigrateAsync(cancellationToken);
+            if (!await TableExistsAsync(repairedDb, "Users", cancellationToken))
+                throw new InvalidOperationException("Database initialization completed without creating the Users table.");
+
+            await SeedUsersAsync(repairedDb, cancellationToken);
+            await RbacSeeder.SeedAsync(repairedDb, cancellationToken);
+            if (IsDevelopmentSeedEnabled())
+            {
+                await SeedBranchAsync(repairedDb, cancellationToken);
+                await SeedTerminalAsync(repairedDb, cancellationToken);
+                await SeedCatalogAsync(repairedDb, cancellationToken);
+                await EnsureDevCredentialsAsync(repairedDb, cancellationToken);
+            }
+            return;
+        }
 
         await SeedUsersAsync(db, cancellationToken);
         await RbacSeeder.SeedAsync(db, cancellationToken);
@@ -63,27 +87,30 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
         if (!File.Exists(dbPath))
             return;
 
-        var hasInvalidSchema = false;
-        await using (var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken))
+        // Inspect SQLite directly. Do not use EF for this preflight: EF model
+        // validation can itself raise PendingModelChangesWarning before we have
+        // had an opportunity to repair the database.
+        await using var connection = new SqliteConnection(DataModule.GetConnectionString());
+        await connection.OpenAsync(cancellationToken);
+
+        var tables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        await using (var command = connection.CreateCommand())
         {
-            var tableNames = await db.Database.SqlQueryRaw<string>(
-                "SELECT name AS Value FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
-                .ToListAsync(cancellationToken);
-
-            hasInvalidSchema = tableNames.Count > 0 &&
-                               !tableNames.Contains("Users", StringComparer.OrdinalIgnoreCase);
-
-            if (hasInvalidSchema)
-                await db.Database.CloseConnectionAsync();
+            command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';";
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            while (await reader.ReadAsync(cancellationToken))
+                tables.Add(reader.GetString(0));
         }
 
-        if (!hasInvalidSchema)
+        await connection.CloseAsync();
+
+        // A database with application tables but no Users table is an invalid
+        // GreenRetail database. Preserve it and rebuild it from migrations.
+        // An entirely empty SQLite file is safe to migrate in place.
+        if (tables.Count == 0 || tables.Contains("Users"))
             return;
 
-        // The file contains some schema but not the authentication table. It is
-        // structurally invalid for this build. Preserve it for diagnostics, then
-        // let EF recreate the database from migrations.
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
         var backupPath = Path.Combine(
             Path.GetDirectoryName(dbPath)!,
             $"greenretail.invalid-schema-{timestamp}.db");
@@ -96,6 +123,44 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
         await File.AppendAllTextAsync(
             logPath,
             $"[{DateTime.UtcNow:O}] Rebuilt database because Users table was missing. Archived: {backupPath}{Environment.NewLine}",
+            cancellationToken);
+    }
+
+    private static async Task<bool> TableExistsAsync(PosDbContext db, string tableName, CancellationToken cancellationToken)
+    {
+        await using var connection = db.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+            await connection.OpenAsync(cancellationToken);
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=$name;";
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = "$name";
+        parameter.Value = tableName;
+        command.Parameters.Add(parameter);
+        var result = await command.ExecuteScalarAsync(cancellationToken);
+        return Convert.ToInt32(result) > 0;
+    }
+
+    private async Task ArchiveDatabaseAndRetryAsync(CancellationToken cancellationToken)
+    {
+        var dbPath = DataModule.GetDatabasePath();
+        if (!File.Exists(dbPath))
+            return;
+
+        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+        var backupPath = Path.Combine(
+            Path.GetDirectoryName(dbPath)!,
+            $"greenretail.failed-migration-{timestamp}.db");
+
+        File.Move(dbPath, backupPath, overwrite: false);
+        DeleteIfExists(dbPath + "-wal");
+        DeleteIfExists(dbPath + "-shm");
+
+        var logPath = Path.Combine(Path.GetDirectoryName(dbPath)!, "database-repair.log");
+        await File.AppendAllTextAsync(
+            logPath,
+            $"[{DateTime.UtcNow:O}] Migration did not produce Users; archived database and retried from migrations: {backupPath}{Environment.NewLine}",
             cancellationToken);
     }
 

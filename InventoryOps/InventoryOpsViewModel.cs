@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GreenRetail.Features.Catalog;
+using GreenRetail.Procurement;
 using GreenRetail.Shared.State;
 
 namespace GreenRetail.InventoryOps;
@@ -16,6 +17,8 @@ public partial class InventoryOpsViewModel : ObservableObject
     private readonly IResolveStockOverrideUseCase _resolveStockOverride;
     private readonly IGetPendingStockOverridesQuery _getPendingOverrides;
     private readonly ICurrentUserService _currentUser;
+    private readonly IGetReadyReceivingQuery _getReadyReceiving;
+    private readonly IPostReceivingGrnUseCase _postReceivingGrn;
 
     [ObservableProperty]
     private string statusMessage = string.Empty;
@@ -53,9 +56,16 @@ public partial class InventoryOpsViewModel : ObservableObject
     [ObservableProperty]
     private string overrideQuantityText = string.Empty;
 
+    [ObservableProperty]
+    private ReadyReceivingListItem? selectedReadyReceiving;
+
+    [ObservableProperty]
+    private string selectedReadyReceivingText = "No completed receiving transaction selected.";
+
     public ObservableCollection<ProductSummary> Products { get; } = new();
     public ObservableCollection<StockAdjustmentListItem> PendingAdjustments { get; } = new();
     public ObservableCollection<StockOverrideListItem> PendingOverrides { get; } = new();
+    public ObservableCollection<ReadyReceivingListItem> ReadyReceivings { get; } = new();
 
     public InventoryOpsViewModel(
         ISearchProductsQuery searchProducts,
@@ -65,7 +75,9 @@ public partial class InventoryOpsViewModel : ObservableObject
         IRequestStockOverrideUseCase requestStockOverride,
         IResolveStockOverrideUseCase resolveStockOverride,
         IGetPendingStockOverridesQuery getPendingOverrides,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        IGetReadyReceivingQuery getReadyReceiving,
+        IPostReceivingGrnUseCase postReceivingGrn)
     {
         _searchProducts = searchProducts;
         _requestStockAdjustment = requestStockAdjustment;
@@ -75,6 +87,8 @@ public partial class InventoryOpsViewModel : ObservableObject
         _resolveStockOverride = resolveStockOverride;
         _getPendingOverrides = getPendingOverrides;
         _currentUser = currentUser;
+        _getReadyReceiving = getReadyReceiving;
+        _postReceivingGrn = postReceivingGrn;
     }
 
     partial void OnSelectedProductChanged(ProductSummary? value)
@@ -91,6 +105,13 @@ public partial class InventoryOpsViewModel : ObservableObject
             : $"Selected adjustment: {value.ProductName}";
     }
 
+    partial void OnSelectedReadyReceivingChanged(ReadyReceivingListItem? value)
+    {
+        SelectedReadyReceivingText = value is null
+            ? "No completed receiving transaction selected."
+            : $"Selected: {value.Number} — {value.SupplierName} — {value.BranchName}";
+    }
+
     partial void OnSelectedOverrideChanged(StockOverrideListItem? value)
     {
         SelectedOverrideText = value is null
@@ -103,6 +124,7 @@ public partial class InventoryOpsViewModel : ObservableObject
         await SearchProductsAsync();
         await RefreshAdjustmentsAsync();
         await RefreshOverridesAsync();
+        await RefreshReadyReceivingAsync();
     }
 
     [RelayCommand]
@@ -286,6 +308,50 @@ public partial class InventoryOpsViewModel : ObservableObject
         {
             OverrideQuantityText = string.Empty;
             await RefreshOverridesAsync();
+        }
+    }
+
+    [RelayCommand]
+    private async Task RefreshReadyReceivingAsync()
+    {
+        if (!_currentUser.UserId.HasValue)
+        {
+            StatusMessage = "You are not signed in.";
+            return;
+        }
+
+        var result = await _getReadyReceiving.ExecuteAsync(
+            new GetReadyReceivingQueryRequest(_currentUser.UserId.Value));
+        if (!result.IsSuccess)
+        {
+            StatusMessage = result.Error ?? "Could not load receiving transactions ready for Inventory.";
+            return;
+        }
+
+        ReadyReceivings.Clear();
+        foreach (var item in result.Value) ReadyReceivings.Add(item);
+    }
+
+    [RelayCommand]
+    private async Task PostSelectedReceivingAsync()
+    {
+        if (!_currentUser.UserId.HasValue || SelectedReadyReceiving is null)
+        {
+            StatusMessage = "Select a completed receiving transaction first.";
+            return;
+        }
+
+        var result = await _postReceivingGrn.ExecuteAsync(
+            new PostReceivingGrnCommand(SelectedReadyReceiving.Id, _currentUser.UserId.Value));
+        StatusMessage = result.IsSuccess
+            ? $"{result.Value.Number} posted to inventory."
+            : result.Error ?? "Inventory posting failed.";
+
+        if (result.IsSuccess)
+        {
+            SelectedReadyReceiving = null;
+            await RefreshReadyReceivingAsync();
+            await SearchProductsAsync();
         }
     }
 }

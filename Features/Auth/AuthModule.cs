@@ -9,6 +9,7 @@ public static class AuthModule
         services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddTransient<IAuthenticateUserUseCase, AuthenticateUserUseCase>();
         services.AddTransient<IChangePasswordUseCase, ChangePasswordUseCase>();
+        services.AddTransient<IOwnerRecoveryUseCase, OwnerRecoveryUseCase>();
         services.AddTransient<ChangePasswordViewModel>();
         services.AddTransient<ChangePasswordPage>();
 

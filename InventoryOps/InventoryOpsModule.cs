@@ -13,6 +13,7 @@ public static class InventoryOpsModule
 
         services.AddTransient<IGetPendingStockAdjustmentsQuery, GetPendingStockAdjustmentsQuery>();
         services.AddTransient<IGetPendingStockOverridesQuery, GetPendingStockOverridesQuery>();
+        services.AddTransient<IGetReadyReceivingQuery, GetReadyReceivingQuery>();
 
         services.AddTransient<InventoryOpsViewModel>();
         services.AddTransient<InventoryOpsPage>();

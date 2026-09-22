@@ -59,8 +59,8 @@
         <ShellContent ContentTemplate="{DataTemplate hubs:PurchasingHubPage}" />
     </FlyoutItem>
 
-    <FlyoutItem Title="Quality Control" Icon="dotnet_bot.png" Route="qc">
-        <ShellContent ContentTemplate="{DataTemplate hubs:QcHubPage}" />
+    <FlyoutItem Title="Quality Control" Icon="dotnet_bot.png" Route="quality-control">
+        <ShellContent ContentTemplate="{DataTemplate hubs:QualityControlHubPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Accounts" Icon="dotnet_bot.png" Route="accounts">

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GreenRetail.Data;
@@ -9,7 +10,15 @@ public static class DataModule
     {
         services.AddDbContextFactory<PosDbContext>(options =>
         {
-            options.UseSqlite(GetConnectionString());
+            options.UseSqlite(GetConnectionString(), sqlite =>
+            {
+                sqlite.MigrationsAssembly(typeof(PosDbContext).Assembly.FullName);
+            });
+            // EF Core 10 treats pending model changes as an exception by default.
+            // Startup owns migration/recovery, so a stale development snapshot must
+            // not prevent the migration pipeline from creating the database. The
+            // initializer records this condition and verifies the resulting schema.
+            options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
 
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();

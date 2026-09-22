@@ -121,3 +121,66 @@ public sealed class GetPendingStockOverridesQuery : IGetPendingStockOverridesQue
         return Result<IReadOnlyList<StockOverrideListItem>>.Ok(result);
     }
 }
+public sealed record GetReadyReceivingQueryRequest(Guid UserId, int Take = 30);
+
+public sealed record ReadyReceivingListItem(
+    Guid Id,
+    string Number,
+    string SupplierName,
+    string BranchName,
+    string VendorInvoiceNumber,
+    string AcceptedSummary,
+    DateTime ReceivedUtc);
+
+public interface IGetReadyReceivingQuery
+    : IUseCase<GetReadyReceivingQueryRequest, Result<IReadOnlyList<ReadyReceivingListItem>>>;
+
+public sealed class GetReadyReceivingQuery : IGetReadyReceivingQuery
+{
+    private readonly IDbContextFactory<PosDbContext> _dbFactory;
+    private readonly GreenRetail.Rbac.IAuthorizationService _authorization;
+
+    public GetReadyReceivingQuery(IDbContextFactory<PosDbContext> dbFactory, GreenRetail.Rbac.IAuthorizationService authorization)
+    {
+        _dbFactory = dbFactory;
+        _authorization = authorization;
+    }
+
+    public async Task<Result<IReadOnlyList<ReadyReceivingListItem>>> ExecuteAsync(
+        GetReadyReceivingQueryRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync(cancellationToken);
+        var sessions = await db.ReceivingSessions
+            .AsNoTracking()
+            .Include(x => x.Supplier)
+            .Include(x => x.Branch)
+            .Include(x => x.Lines)
+            .Where(x => x.Status == GreenRetail.Procurement.ReceivingStatus.ReadyForPosting)
+            .OrderByDescending(x => x.ReceivedUtc)
+            .Take(request.Take)
+            .ToListAsync(cancellationToken);
+
+        var allowed = new List<ReadyReceivingListItem>();
+        foreach (var x in sessions)
+        {
+            if (!await _authorization.HasPermissionAsync(
+                    request.UserId,
+                    GreenRetail.Rbac.PermissionCodes.ReceivingGrnPost,
+                    x.BranchId,
+                    cancellationToken))
+                continue;
+
+            allowed.Add(new ReadyReceivingListItem(
+                x.Id,
+                x.Number,
+                x.Supplier?.Name ?? "Unknown supplier",
+                x.Branch?.Name ?? "Unknown branch",
+                x.VendorInvoiceNumber,
+                $"{x.Lines.Sum(l => l.AcceptedQuantity):0.###} accepted / {x.Lines.Sum(l => l.RejectedQuantity):0.###} rejected",
+                x.ReceivedUtc));
+        }
+
+        return Result<IReadOnlyList<ReadyReceivingListItem>>.Ok(allowed);
+    }
+}
