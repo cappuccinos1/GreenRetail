@@ -6,43 +6,44 @@
              x:DataType="vm:CashSessionViewModel"
              Title="Cash Session">
 
-    <Grid Padding="24">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" WidthRequest="520" HorizontalOptions="Center" Spacing="14">
+            <Label Text="Cash Session" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="{Binding SessionActionText}" FontSize="16" HorizontalTextAlignment="Center" />
+            <Label Text="{Binding StatusMessage}" TextColor="Gray" HorizontalTextAlignment="Center" />
 
-        <VerticalStackLayout WidthRequest="420"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Center"
-                             Spacing="12">
+            <Border Stroke="#D1D5DB" StrokeThickness="1" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Open register" FontAttributes="Bold" />
+                    <Entry Text="{Binding OpeningCashText}" Keyboard="Numeric" Placeholder="Opening cash (₦)" />
+                    <Button Text="Open Cash Session" Command="{Binding OpenSessionCommand}"
+                            IsVisible="{Binding IsSessionOpen, Converter={StaticResource InvertedBoolConverter}}" />
+                </VerticalStackLayout>
+            </Border>
 
-            <Label Text="Cash Session"
-                   FontSize="24"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center" />
+            <Border Stroke="#D1D5DB" StrokeThickness="1" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Close / blind count" FontAttributes="Bold" />
+                    <Label Text="The expected cash amount is deliberately not shown to the counter." FontSize="13" TextColor="Gray" />
 
-            <Label Text="{Binding SessionStatus}"
-                   FontSize="16" />
+                    <Button Text="Send to Accounts for Blind Count"
+                            Command="{Binding CloseSessionCommand}"
+                            IsVisible="{Binding IsNotCounting}" />
 
-            <Entry Text="{Binding OpeningCashInput}"
-                   Keyboard="Numeric"
-                   Placeholder="Opening cash" />
+                    <Entry Text="{Binding CountedCashText}"
+                           Keyboard="Numeric"
+                           Placeholder="Accounts: enter counted cash (₦)"
+                           IsVisible="{Binding IsCounting}" />
 
-            <Button Text="Open Cash Session"
-                    Command="{Binding OpenSessionCommand}" />
+                    <Button Text="Record Blind Count"
+                            Command="{Binding CloseSessionCommand}"
+                            IsVisible="{Binding IsCounting}" />
 
-            <Label Text="{Binding ExpectedCash, StringFormat='Expected Cash: {0}'}"
-                   FontSize="18" />
-
-            <Entry Text="{Binding CountedCashInput}"
-                   Keyboard="Numeric"
-                   Placeholder="Counted cash" />
-
-            <Button Text="Close Cash Session"
-                    Command="{Binding CloseSessionCommand}" />
-
-            <Label Text="{Binding Variance, StringFormat='Variance: {0}'}"
-                   FontSize="18" />
-
-            <Label Text="{Binding StatusMessage}"
-                   TextColor="Gray" />
+                    <Button Text="Approve Variance &amp; Close"
+                            Command="{Binding ApproveVarianceCommand}"
+                            IsVisible="{Binding CanApproveVariance}" />
+                </VerticalStackLayout>
+            </Border>
         </VerticalStackLayout>
-    </Grid>
+    </ScrollView>
 </ContentPage>

@@ -8,6 +8,7 @@ public static class CashSessionsModule
     {
         services.AddTransient<IOpenRegisterUseCase, OpenRegisterUseCase>();
         services.AddTransient<ICloseRegisterUseCase, CloseRegisterUseCase>();
+        services.AddTransient<IApproveCashVarianceUseCase, ApproveCashVarianceUseCase>();
         services.AddTransient<IGetActiveSessionQuery, GetActiveSessionQuery>();
 
         services.AddTransient<CashSessionViewModel>();
