@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GreenRetail.Data;
@@ -11,9 +10,6 @@ public static class DataModule
         services.AddDbContextFactory<PosDbContext>(options =>
         {
             options.UseSqlite(GetConnectionString());
-            
-            // Suppress the strict pending model changes warning during dev/refactoring
-            options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
 
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
@@ -35,6 +31,6 @@ public static class DataModule
 
         Directory.CreateDirectory(dir);
 
-        return Path.Combine(dir, "greenRetail-v3.db"); // Bumped to v3 to force a clean slate
+        return Path.Combine(dir, "greenretail.db");
     }
 }

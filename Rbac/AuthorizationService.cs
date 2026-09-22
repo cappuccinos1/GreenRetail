@@ -11,6 +11,7 @@ public interface IAuthorizationService
         string permissionCode,
         Guid? branchId = null,
         CancellationToken cancellationToken = default);
+    Task<bool> HasAnyPermissionAsync(Guid userId, IEnumerable<string> permissionCodes, Guid? branchId = null, CancellationToken cancellationToken = default);
 }
 
 public sealed class AuthorizationService : IAuthorizationService
@@ -42,7 +43,7 @@ public sealed class AuthorizationService : IAuthorizationService
             join permission in db.Permissions on rolePermission.PermissionId equals permission.Id
             where userRole.UserId == userId
                   && permission.Code == permissionCode
-                  && (userRole.BranchId == null || branchId == null || userRole.BranchId == branchId)
+                  && (userRole.BranchId == null || (branchId.HasValue && userRole.BranchId == branchId))
             select userRole
         ).AnyAsync(cancellationToken);
 
@@ -54,9 +55,20 @@ public sealed class AuthorizationService : IAuthorizationService
                 x.UserId == userId &&
                 x.Permission!.Code == permissionCode &&
                 x.StartUtc <= now &&
-                x.EndUtc > now,
+                x.EndUtc > now &&
+                (x.BranchId == null || (branchId.HasValue && x.BranchId == branchId)),
                 cancellationToken);
 
         return hasOverride;
+    }
+
+    public async Task<bool> HasAnyPermissionAsync(Guid userId, IEnumerable<string> permissionCodes, Guid? branchId = null, CancellationToken cancellationToken = default)
+    {
+        foreach (var permissionCode in permissionCodes)
+        {
+            if (await HasPermissionAsync(userId, permissionCode, branchId, cancellationToken))
+                return true;
+        }
+        return false;
     }
 }

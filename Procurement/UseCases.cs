@@ -331,6 +331,9 @@ public sealed class PostGrnUseCase : IPostGrnUseCase
 
             if (line.AcceptedQuantity > 0m)
             {
+                if (!grn.BranchId.HasValue)
+                    return Result<GrnResult>.Fail("A branch is required before received stock can be posted.");
+
                 if (product.RequiresExpiry && line.ExpiryUtc is null)
                 {
                     return Result<GrnResult>.Fail($"Expiry date is required for '{product.Name}'.");
@@ -347,13 +350,14 @@ public sealed class PostGrnUseCase : IPostGrnUseCase
                 }
 
                 var stock = await db.StockLevels
-                    .FirstOrDefaultAsync(x => x.ProductId == product.Id, cancellationToken);
+                    .FirstOrDefaultAsync(x => x.ProductId == product.Id && x.BranchId == grn.BranchId.Value, cancellationToken);
 
                 if (stock is null)
                 {
                     stock = new StockLevel
                     {
                         ProductId = product.Id,
+                        BranchId = grn.BranchId.Value,
                         Quantity = 0m
                     };
 
@@ -365,6 +369,7 @@ public sealed class PostGrnUseCase : IPostGrnUseCase
                 db.StockLedger.Add(new StockLedgerEntry
                 {
                     ProductId = product.Id,
+                    BranchId = grn.BranchId.Value,
                     QuantityChange = line.AcceptedQuantity,
                     Reason = StockMovementReason.Purchase,
                     Note = $"GRN {grn.Number}",

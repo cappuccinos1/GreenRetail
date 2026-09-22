@@ -76,9 +76,11 @@ public class PosDbContext : DbContext
         modelBuilder.Entity<Product>().HasOne(x => x.Unit).WithMany().HasForeignKey(x => x.UnitId);
         modelBuilder.Entity<Barcode>().HasIndex(x => x.Value).IsUnique();
         modelBuilder.Entity<Barcode>().HasOne(x => x.Product).WithMany(x => x.Barcodes).HasForeignKey(x => x.ProductId);
-        modelBuilder.Entity<StockLevel>().HasIndex(x => x.ProductId).IsUnique();
+        modelBuilder.Entity<StockLevel>().HasIndex(x => new { x.BranchId, x.ProductId }).IsUnique();
         modelBuilder.Entity<StockLevel>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<StockLevel>().HasOne(x => x.Branch).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<StockLedgerEntry>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<StockLedgerEntry>().HasOne(x => x.Branch).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
 
         // CashSession scoping
         modelBuilder.Entity<CashSession>().HasOne(x => x.Terminal).WithMany().HasForeignKey(x => x.TerminalId).OnDelete(DeleteBehavior.Restrict);

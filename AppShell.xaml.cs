@@ -9,6 +9,7 @@ using GreenRetail.Procurement;
 using GreenRetail.Rbac;
 using GreenRetail.Refunds;
 using GreenRetail.SecurityOps;
+using GreenRetail.Features.Setup;
 
 namespace GreenRetail;
 
@@ -34,5 +35,6 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute("trial-balance", typeof(TrialBalancePage));
         Routing.RegisterRoute("rbac-explorer", typeof(RbacExplorerPage));
+        Routing.RegisterRoute("system-setup", typeof(SetupPage));
     }
 }

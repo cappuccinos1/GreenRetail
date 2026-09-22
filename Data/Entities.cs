@@ -81,6 +81,8 @@ public class StockLevel
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid ProductId { get; set; }
     public Product? Product { get; set; }
+    public Guid BranchId { get; set; }
+    public Branch? Branch { get; set; }
     public decimal Quantity { get; set; }
 }
 
@@ -89,6 +91,8 @@ public class StockLedgerEntry
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid ProductId { get; set; }
     public Product? Product { get; set; }
+    public Guid BranchId { get; set; }
+    public Branch? Branch { get; set; }
     public decimal QuantityChange { get; set; }
     public StockMovementReason Reason { get; set; }
     public string? Note { get; set; }

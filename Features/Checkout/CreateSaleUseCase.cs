@@ -7,6 +7,8 @@ using GreenRetail.Core.Terminal;
 using GreenRetail.Data;
 using GreenRetail.Data.Entities;
 using GreenRetail.Shared.State;
+using GreenRetail.Rbac;
+using Microsoft.Extensions.Logging;
 
 namespace GreenRetail.Features.Checkout;
 
@@ -33,19 +35,25 @@ public sealed class CreateSaleUseCase : ICreateSaleUseCase
     private readonly ICurrentUserService _currentUser;
     private readonly IPricingPolicy _pricingPolicy;
     private readonly IClock _clock;
+    private readonly IAuthorizationService _authorization;
+    private readonly ILogger<CreateSaleUseCase> _logger;
 
     public CreateSaleUseCase(
         IDbContextFactory<PosDbContext> dbContextFactory,
         ITerminalContext terminalContext,
         ICurrentUserService currentUser,
         IPricingPolicy pricingPolicy,
-        IClock clock)
+        IClock clock,
+        IAuthorizationService authorization,
+        ILogger<CreateSaleUseCase> logger)
     {
         _dbContextFactory = dbContextFactory;
         _terminalContext = terminalContext;
         _currentUser = currentUser;
         _pricingPolicy = pricingPolicy;
         _clock = clock;
+        _authorization = authorization;
+        _logger = logger;
     }
 
     public async Task<Result<CreatedSaleResult>> ExecuteAsync(
@@ -53,7 +61,10 @@ public sealed class CreateSaleUseCase : ICreateSaleUseCase
         CancellationToken cancellationToken = default)
     {
         if (!_currentUser.IsAuthenticated || !_currentUser.UserId.HasValue)
-            return Result<CreatedSaleResult>.Fail("You must be signed in to complete a sale.");
+            return Result<CreatedSaleResult>.Fail("You must be signed in to complete a sale.", ResultErrorCode.Authorization);
+
+        if (!await _authorization.HasPermissionAsync(_currentUser.UserId.Value, PermissionCodes.PosSaleCreate, _terminalContext.BranchId, cancellationToken))
+            return Result<CreatedSaleResult>.Fail("You do not have permission to create sales.", ResultErrorCode.Authorization);
 
         if (string.IsNullOrWhiteSpace(command.IdempotencyKey))
             return Result<CreatedSaleResult>.Fail("A sale idempotency key is required.");
@@ -95,8 +106,8 @@ public sealed class CreateSaleUseCase : ICreateSaleUseCase
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == _terminalContext.TerminalId && x.IsActive, cancellationToken);
 
-            if (terminal is null)
-                return Result<CreatedSaleResult>.Fail("This POS terminal is not active.");
+            if (terminal is null || terminal.BranchId is null)
+                return Result<CreatedSaleResult>.Fail("This POS terminal is not configured with an active branch.", ResultErrorCode.Conflict);
 
             var cashSession = await db.CashSessions
                 .FirstOrDefaultAsync(x =>
@@ -211,9 +222,11 @@ public sealed class CreateSaleUseCase : ICreateSaleUseCase
                     @"UPDATE StockLevels
                       SET Quantity = Quantity - {0}
                       WHERE ProductId = {1}
+                        AND BranchId = {2}
                         AND (Quantity - {0}) >= 0",
                     group.Quantity,
                     group.ProductId,
+                    terminal.BranchId.Value,
                     cancellationToken);
 
                 if (rowsAffected == 0)
@@ -222,6 +235,7 @@ public sealed class CreateSaleUseCase : ICreateSaleUseCase
                 db.StockLedger.Add(new StockLedgerEntry
                 {
                     ProductId = group.ProductId,
+                    BranchId = terminal.BranchId.Value,
                     QuantityChange = -group.Quantity,
                     Reason = StockMovementReason.Sale,
                     Note = $"Sale {command.IdempotencyKey}",
@@ -242,12 +256,14 @@ public sealed class CreateSaleUseCase : ICreateSaleUseCase
         catch (DbUpdateException ex)
         {
             await transaction.RollbackAsync(CancellationToken.None);
-            return Result<CreatedSaleResult>.Fail($"Sale could not be saved: {ex.GetBaseException().Message}");
+            _logger.LogError(ex, "Database failure while creating sale {IdempotencyKey} for user {UserId}", command.IdempotencyKey, _currentUser.UserId);
+            return Result<CreatedSaleResult>.Fail("The sale could not be saved. No money or stock was committed.", ResultErrorCode.Infrastructure);
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync(CancellationToken.None);
-            return Result<CreatedSaleResult>.Fail($"Transaction failed: {ex.Message}");
+            _logger.LogError(ex, "Unexpected failure while creating sale {IdempotencyKey} for user {UserId}", command.IdempotencyKey, _currentUser.UserId);
+            return Result<CreatedSaleResult>.Fail("The transaction could not be completed. Please try again.", ResultErrorCode.Unexpected);
         }
     }
 

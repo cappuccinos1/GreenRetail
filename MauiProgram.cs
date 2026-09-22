@@ -20,6 +20,7 @@ using GreenRetail.Procurement;
 using GreenRetail.Rbac;
 using GreenRetail.Refunds;
 using GreenRetail.SecurityOps;
+using GreenRetail.Features.Setup;
 
 namespace GreenRetail;
 
@@ -51,6 +52,7 @@ public static class MauiProgram
         builder.Services.AddRefundsFeature();
         builder.Services.AddSecurityOpsFeature();
         builder.Services.AddBackOfficeFeature();
+        builder.Services.AddSetupFeature();
         builder.Services.AddProcurementFeature();
 
         builder.Services.AddTransient<SellHubPage>();

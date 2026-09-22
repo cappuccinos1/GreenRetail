@@ -7,6 +7,8 @@ public sealed class Pbkdf2PasswordHasher : IPasswordHasher
     private const int SaltSize = 16;
     private const int KeySize = 32;
     private const int Iterations = 100_000;
+    private static readonly byte[] DummySalt = Convert.FromHexString("5B3A9C1E4D7F2A8B6C0D112233445566");
+    private static readonly byte[] DummyHash = Rfc2898DeriveBytes.Pbkdf2("GreenRetail-Dummy-Password", DummySalt, Iterations, HashAlgorithmName.SHA256, KeySize);
 
     public (byte[] Salt, byte[] Hash) CreateHash(string password)
     {
@@ -34,6 +36,8 @@ public sealed class Pbkdf2PasswordHasher : IPasswordHasher
             && password.Any(char.IsDigit)
             && password.Any(ch => !char.IsLetterOrDigit(ch));
     }
+
+    public bool VerifyAgainstDummy(string password) => Verify(password, DummySalt, DummyHash);
 
     public bool Verify(string password, byte[] salt, byte[] hash)
     {

@@ -63,7 +63,7 @@ public sealed class AuthenticateUserUseCase : IAuthenticateUserUseCase
         if (user is null)
         {
             // Dummy verification to reduce username-enumeration timing differences.
-            _passwordHasher.Verify(request.Password, new byte[16], new byte[32]);
+            _passwordHasher.VerifyAgainstDummy(request.Password);
 
             return Result<AuthenticatedUser>.Fail("Invalid username or password.");
         }

@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
-using GreenRetail.Accounting;
 using GreenRetail.Data.Entities;
 using GreenRetail.Features.Auth;
 using GreenRetail.Rbac;
+using GreenRetail.Core.Abstractions;
 
 namespace GreenRetail.Data;
 
@@ -16,13 +16,16 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
 {
     private readonly IDbContextFactory<PosDbContext> _dbContextFactory;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IClock _clock;
 
     public DatabaseInitializer(
         IDbContextFactory<PosDbContext> dbContextFactory,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        IClock clock)
     {
         _dbContextFactory = dbContextFactory;
         _passwordHasher = passwordHasher;
+        _clock = clock;
     }
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -33,14 +36,18 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
         // This keeps the app consistent with `dotnet ef database update`.
         await db.Database.MigrateAsync(cancellationToken);
 
-        await SeedBranchAsync(db, cancellationToken);
-        await SeedTerminalAsync(db, cancellationToken);
         await SeedUsersAsync(db, cancellationToken);
-        await EnsureDevCredentialsAsync(db, cancellationToken);
-        await SeedCatalogAsync(db, cancellationToken);
-
-        await AccountingSeeder.SeedAsync(db, cancellationToken);
         await RbacSeeder.SeedAsync(db, cancellationToken);
+
+        // Business/sample data is opt-in. A fresh installation contains no branch,
+        // terminal, catalog or test users until setup (or explicit dev seeding).
+        if (IsDevelopmentSeedEnabled())
+        {
+            await SeedBranchAsync(db, cancellationToken);
+            await SeedTerminalAsync(db, cancellationToken);
+            await SeedCatalogAsync(db, cancellationToken);
+            await EnsureDevCredentialsAsync(db, cancellationToken);
+        }
     }
 
     private async Task SeedBranchAsync(PosDbContext db, CancellationToken cancellationToken)
@@ -94,109 +101,85 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
 
     private async Task SeedUsersAsync(PosDbContext db, CancellationToken cancellationToken)
     {
-        if (await db.Users.AnyAsync(cancellationToken))
-            return;
+        if (await db.Users.AnyAsync(cancellationToken)) return;
 
-#if DEBUG
-        var users = new[]
-        {
-            ("owner", "Owner", "Owner", "Owner!123"),
-            ("manager", "Manager", "Manager", "Manager!123"),
-            ("cashier", "Cashier", "Cashier", "Cashier!123")
-        };
-#else
-        // Never ship a known production password. The first owner receives a
-        // random one-time bootstrap password in a local file and must change it.
         var temporaryPassword = GenerateTemporaryPassword();
-        var users = new[]
+        var (salt, hash) = _passwordHasher.CreateHash(temporaryPassword);
+        db.Users.Add(new AppUser
         {
-            ("owner", "Owner", "Owner", temporaryPassword)
-        };
-
-        WriteInitialOwnerCredentials("owner", temporaryPassword);
-#endif
-
-        foreach (var (userName, displayName, role, password) in users)
-        {
-            var (salt, hash) = _passwordHasher.CreateHash(password);
-
-            db.Users.Add(new AppUser
-            {
-                UserName = userName,
-                Name = displayName,
-                Role = role,
-                PasswordSalt = salt,
-                PasswordHash = hash,
-                IsActive = true,
-                RequiresPasswordChange = true,
-                CreatedUtc = DateTime.UtcNow
-            });
-        }
-
+            UserName = "owner", Name = "Owner", Role = "Owner",
+            PasswordSalt = salt, PasswordHash = hash, IsActive = true,
+            RequiresPasswordChange = true, CreatedUtc = _clock.UtcNow
+        });
         await db.SaveChangesAsync(cancellationToken);
+        WriteInitialOwnerCredentials("owner", temporaryPassword);
     }
 
-#if !DEBUG
     private static string GenerateTemporaryPassword()
     {
         const string alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
         var chars = new char[24];
-        for (var i = 0; i < chars.Length; i++)
-            chars[i] = alphabet[RandomNumberGenerator.GetInt32(alphabet.Length)];
-
+        for (var i = 0; i < chars.Length; i++) chars[i] = alphabet[RandomNumberGenerator.GetInt32(alphabet.Length)];
         return new string(chars);
     }
 
-    private static void WriteInitialOwnerCredentials(string userName, string password)
+    private void WriteInitialOwnerCredentials(string userName, string password)
     {
-        var dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "GreenRetail");
+        var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GreenRetail");
         Directory.CreateDirectory(dir);
-
         var path = Path.Combine(dir, "INITIAL_OWNER_CREDENTIALS.txt");
         File.WriteAllText(path,
             $"GREEN RETAIL INITIAL OWNER CREDENTIALS{Environment.NewLine}" +
-            $"Generated: {DateTime.UtcNow:O}{Environment.NewLine}{Environment.NewLine}" +
+            $"Generated: {_clock.UtcNow:O}{Environment.NewLine}{Environment.NewLine}" +
             $"Username: {userName}{Environment.NewLine}" +
             $"Temporary password: {password}{Environment.NewLine}{Environment.NewLine}" +
             "Change this password immediately after first login, then delete this file.");
     }
-#endif
+
+    private static bool IsDevelopmentSeedEnabled()
+        => string.Equals(Environment.GetEnvironmentVariable("GREENRETAIL_DEV_SEED"), "true", StringComparison.OrdinalIgnoreCase);
 
     private async Task EnsureDevCredentialsAsync(PosDbContext db, CancellationToken cancellationToken)
     {
 #if DEBUG
         var devUsers = new[]
         {
-            ("owner", "Owner!123"),
-            ("manager", "Manager!123"),
-            ("cashier", "Cashier!123")
+            (UserName: "owner", Name: "Owner", Password: "Owner!123", RoleName: "Owner"),
+            (UserName: "manager", Name: "Manager", Password: "Manager!123", RoleName: "CashierManager"),
+            (UserName: "cashier", Name: "Cashier", Password: "Cashier!123", RoleName: "Cashier")
         };
 
-        foreach (var (userName, password) in devUsers)
+        foreach (var dev in devUsers)
         {
-            var user = await db.Users
-                .FirstOrDefaultAsync(x => x.UserName == userName, cancellationToken);
-
+            var user = await db.Users.FirstOrDefaultAsync(x => x.UserName == dev.UserName, cancellationToken);
             if (user is null)
-                continue;
-
-            var isValid =
-                user.PasswordSalt.Length > 0 &&
-                user.PasswordHash.Length > 0 &&
-                _passwordHasher.Verify(password, user.PasswordSalt, user.PasswordHash);
-
-            if (!isValid)
             {
-                var (salt, hash) = _passwordHasher.CreateHash(password);
+                var (salt, hash) = _passwordHasher.CreateHash(dev.Password);
+                user = new AppUser
+                {
+                    UserName = dev.UserName, Name = dev.Name, Role = dev.RoleName,
+                    PasswordSalt = salt, PasswordHash = hash, IsActive = true,
+                    RequiresPasswordChange = false, CreatedUtc = _clock.UtcNow
+                };
+                db.Users.Add(user);
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            else
+            {
+                var isValid = user.PasswordSalt.Length > 0 && user.PasswordHash.Length > 0 && _passwordHasher.Verify(dev.Password, user.PasswordSalt, user.PasswordHash);
+                if (!isValid)
+                {
+                    var (salt, hash) = _passwordHasher.CreateHash(dev.Password);
+                    user.PasswordSalt = salt; user.PasswordHash = hash; user.IsActive = true;
+                    user.LockoutEndUtc = null; user.FailedLoginCount = 0;
+                }
+                user.Role = dev.RoleName;
+            }
 
-                user.PasswordSalt = salt;
-                user.PasswordHash = hash;
-                user.IsActive = true;
-                user.RequiresPasswordChange = true;
-                user.LockoutEndUtc = null;
-                user.FailedLoginCount = 0;
+            var role = await db.Roles.FirstOrDefaultAsync(x => x.Name == dev.RoleName, cancellationToken);
+            if (role is not null && !await db.UserRoles.AnyAsync(x => x.UserId == user.Id && x.RoleId == role.Id, cancellationToken))
+            {
+                db.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = role.Id, AssignedUtc = _clock.UtcNow });
             }
         }
 

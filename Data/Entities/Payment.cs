@@ -38,7 +38,7 @@ public class Payment
     public string? IdempotencyKey { get; set; }
 
     public string? Reference { get; set; }
-    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedUtc { get; set; }
 
     // Compatibility decimal property for older EF queries/use cases.
     public decimal Amount

@@ -123,14 +123,18 @@ public sealed class ApproveStockAdjustmentUseCase : IApproveStockAdjustmentUseCa
             return Result<StockAdjustmentRequestResult>.Fail("Stock adjustment request has already been processed.");
         }
 
+        if (!request.BranchId.HasValue)
+            return Result<StockAdjustmentRequestResult>.Fail("A branch is required before stock can be posted.");
+
         var stock = await db.StockLevels
-            .FirstOrDefaultAsync(x => x.ProductId == request.ProductId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.BranchId == request.BranchId, cancellationToken);
 
         if (stock is null)
         {
             stock = new StockLevel
             {
                 ProductId = request.ProductId,
+                BranchId = request.BranchId.Value,
                 Quantity = 0m
             };
 
@@ -142,6 +146,7 @@ public sealed class ApproveStockAdjustmentUseCase : IApproveStockAdjustmentUseCa
         db.StockLedger.Add(new StockLedgerEntry
         {
             ProductId = request.ProductId,
+            BranchId = request.BranchId.Value,
             QuantityChange = request.QuantityChange,
             Reason = StockMovementReason.Adjustment,
             Note = request.Reason,
@@ -270,14 +275,18 @@ public sealed class ResolveStockOverrideUseCase : IResolveStockOverrideUseCase
             return Result<StockOverrideRequestResult>.Fail("Stock override request has already been processed.");
         }
 
+        if (!request.BranchId.HasValue)
+            return Result<StockOverrideRequestResult>.Fail("A branch is required before stock can be posted.");
+
         var stock = await db.StockLevels
-            .FirstOrDefaultAsync(x => x.ProductId == request.ProductId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.ProductId == request.ProductId && x.BranchId == request.BranchId, cancellationToken);
 
         if (stock is null)
         {
             stock = new StockLevel
             {
                 ProductId = request.ProductId,
+                BranchId = request.BranchId.Value,
                 Quantity = 0m
             };
 
@@ -289,6 +298,7 @@ public sealed class ResolveStockOverrideUseCase : IResolveStockOverrideUseCase
         db.StockLedger.Add(new StockLedgerEntry
         {
             ProductId = request.ProductId,
+            BranchId = request.BranchId.Value,
             QuantityChange = command.QuantityToAdd,
             Reason = StockMovementReason.Adjustment,
             Note = "POS stock override",

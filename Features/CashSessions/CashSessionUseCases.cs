@@ -41,13 +41,15 @@ public sealed class OpenRegisterUseCase : IOpenRegisterUseCase
     private readonly ITerminalContext _terminal;
     private readonly ICurrentUserService _currentUser;
     private readonly IClock _clock;
+    private readonly GreenRetail.Rbac.IAuthorizationService _authorization;
 
-    public OpenRegisterUseCase(IDbContextFactory<PosDbContext> dbFactory, ITerminalContext terminal, ICurrentUserService currentUser, IClock clock)
+    public OpenRegisterUseCase(IDbContextFactory<PosDbContext> dbFactory, ITerminalContext terminal, ICurrentUserService currentUser, IClock clock, GreenRetail.Rbac.IAuthorizationService authorization)
     {
         _dbFactory = dbFactory;
         _terminal = terminal;
         _currentUser = currentUser;
         _clock = clock;
+        _authorization = authorization;
     }
 
     public async Task<Result<CashSession>> ExecuteAsync(OpenRegisterCommand cmd, CancellationToken ct = default)
@@ -58,8 +60,8 @@ public sealed class OpenRegisterUseCase : IOpenRegisterUseCase
         if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
             return Result<CashSession>.Fail("You must be signed in to open the register.");
 
-        if (_currentUser.Role is not ("Manager" or "Owner"))
-            return Result<CashSession>.Fail("Only a Manager or Owner can open the register.");
+        if (!await _authorization.HasPermissionAsync(_currentUser.UserId.Value, GreenRetail.Rbac.PermissionCodes.PosSessionOpen, _terminal.BranchId, ct))
+            return Result<CashSession>.Fail("You do not have permission to open the register.", ResultErrorCode.Authorization);
 
         await using var db = await _dbFactory.CreateDbContextAsync(ct);
         
@@ -102,13 +104,15 @@ public sealed class CloseRegisterUseCase : ICloseRegisterUseCase
     private readonly ITerminalContext _terminal;
     private readonly ICurrentUserService _currentUser;
     private readonly IClock _clock;
+    private readonly GreenRetail.Rbac.IAuthorizationService _authorization;
 
-    public CloseRegisterUseCase(IDbContextFactory<PosDbContext> dbFactory, ITerminalContext terminal, ICurrentUserService currentUser, IClock clock)
+    public CloseRegisterUseCase(IDbContextFactory<PosDbContext> dbFactory, ITerminalContext terminal, ICurrentUserService currentUser, IClock clock, GreenRetail.Rbac.IAuthorizationService authorization)
     {
         _dbFactory = dbFactory;
         _terminal = terminal;
         _currentUser = currentUser;
         _clock = clock;
+        _authorization = authorization;
     }
 
     public async Task<Result<CashSession>> ExecuteAsync(CloseRegisterCommand cmd, CancellationToken ct = default)
@@ -116,8 +120,8 @@ public sealed class CloseRegisterUseCase : ICloseRegisterUseCase
         if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
             return Result<CashSession>.Fail("You must be signed in to close the register.");
 
-        if (_currentUser.Role is not ("Manager" or "Owner"))
-            return Result<CashSession>.Fail("Only a Manager or Owner can close the register.");
+        if (!await _authorization.HasPermissionAsync(_currentUser.UserId.Value, GreenRetail.Rbac.PermissionCodes.PosSessionClose, _terminal.BranchId, ct))
+            return Result<CashSession>.Fail("You do not have permission to close the register.", ResultErrorCode.Authorization);
 
         if (cmd.CountedCashKobo < 0)
             return Result<CashSession>.Fail("Counted cash cannot be negative.");

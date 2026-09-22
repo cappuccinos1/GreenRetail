@@ -697,6 +697,9 @@ namespace GreenRetail.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("QuantityChange")
                         .HasColumnType("TEXT");
 
@@ -704,6 +707,8 @@ namespace GreenRetail.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
 
                     b.HasIndex("ProductId");
 
@@ -719,12 +724,17 @@ namespace GreenRetail.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("Quantity")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId")
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("BranchId", "ProductId")
                         .IsUnique();
 
                     b.ToTable("StockLevels");
@@ -1599,6 +1609,12 @@ namespace GreenRetail.Migrations
 
             modelBuilder.Entity("GreenRetail.Data.Entities.StockLedgerEntry", b =>
                 {
+                    b.HasOne("GreenRetail.Data.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("GreenRetail.Data.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -1610,6 +1626,12 @@ namespace GreenRetail.Migrations
 
             modelBuilder.Entity("GreenRetail.Data.Entities.StockLevel", b =>
                 {
+                    b.HasOne("GreenRetail.Data.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("GreenRetail.Data.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")

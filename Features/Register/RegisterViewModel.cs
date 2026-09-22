@@ -77,10 +77,7 @@ public partial class RegisterViewModel : ObservableObject
         else
         {
             IsSessionOpen = false;
-            bool isManager = _currentUser.Role == "Manager" || _currentUser.Role == "Owner";
-            SessionStatusText = isManager 
-                ? "Register Closed. Enter opening cash and open session." 
-                : "Register Closed. Please wait for a Manager to open the session.";
+            SessionStatusText = "Register Closed. Enter opening cash if you are authorized to open the session.";
         }
     }
 
