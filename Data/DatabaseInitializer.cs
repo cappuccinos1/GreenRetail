@@ -42,9 +42,13 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
         await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         // The schema is migration-owned. Never fall back to EnsureCreated.
-        // PendingModelChangesWarning is ignored by DataModule during this controlled
-        // development migration/recovery phase; the initializer verifies the resulting schema.
+        // Migrate first, then reconcile a small class of legacy development-schema
+        // drift where __EFMigrationsHistory says a migration ran but the SQLite
+        // object it was supposed to create is absent. This is what makes recovery
+        // safe for databases produced by the earlier development sweeps.
         await db.Database.MigrateAsync(cancellationToken);
+        await db.Database.CloseConnectionAsync();
+        await RepairKnownSchemaDriftAsync(cancellationToken);
 
         if (!await TableExistsAsync(db, "Users", cancellationToken))
         {
@@ -52,6 +56,8 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
             await ArchiveDatabaseAndRetryAsync(cancellationToken);
             await using var repairedDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
             await repairedDb.Database.MigrateAsync(cancellationToken);
+            await repairedDb.Database.CloseConnectionAsync();
+            await RepairKnownSchemaDriftAsync(cancellationToken);
             if (!await TableExistsAsync(repairedDb, "Users", cancellationToken))
                 throw new InvalidOperationException("Database initialization completed without creating the Users table.");
 
@@ -124,6 +130,62 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
             logPath,
             $"[{DateTime.UtcNow:O}] Rebuilt database because Users table was missing. Archived: {backupPath}{Environment.NewLine}",
             cancellationToken);
+    }
+
+    private async Task RepairKnownSchemaDriftAsync(CancellationToken cancellationToken)
+    {
+        // The 20260922000400_AddTerminalBranchScope migration was introduced during
+        // the branch/terminal work. Some development databases can contain the
+        // migration-history row while still having the pre-branch Terminals table.
+        // EF then generates SELECTs containing t.BranchId and SQLite fails before
+        // login/recovery can run. Repair the actual SQLite schema before any EF
+        // query touches Terminals.
+        await using var connection = new SqliteConnection(DataModule.GetConnectionString());
+        await connection.OpenAsync(cancellationToken);
+
+        if (!await SqliteTableExistsAsync(connection, "Terminals", cancellationToken))
+            return;
+
+        if (!await SqliteColumnExistsAsync(connection, "Terminals", "BranchId", cancellationToken))
+        {
+            await using var addColumn = connection.CreateCommand();
+            addColumn.CommandText = "ALTER TABLE Terminals ADD COLUMN BranchId TEXT NULL;";
+            await addColumn.ExecuteNonQueryAsync(cancellationToken);
+
+            await File.AppendAllTextAsync(
+                Path.Combine(Path.GetDirectoryName(DataModule.GetDatabasePath())!, "database-repair.log"),
+                $"[{DateTime.UtcNow:O}] Repaired legacy Terminals schema: added missing BranchId column before authentication/seed queries.{Environment.NewLine}",
+                cancellationToken);
+        }
+
+        await using var createIndex = connection.CreateCommand();
+        createIndex.CommandText = "CREATE INDEX IF NOT EXISTS IX_Terminals_BranchId ON Terminals (BranchId);";
+        await createIndex.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    private static async Task<bool> SqliteTableExistsAsync(SqliteConnection connection, string tableName, CancellationToken cancellationToken)
+    {
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=$name;";
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = "$name";
+        parameter.Value = tableName;
+        command.Parameters.Add(parameter);
+        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) > 0;
+    }
+
+    private static async Task<bool> SqliteColumnExistsAsync(SqliteConnection connection, string tableName, string columnName, CancellationToken cancellationToken)
+    {
+        await using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info(\"{tableName.Replace("\"", "\"\"")}\");";
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            if (string.Equals(reader.GetString(1), columnName, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     private static async Task<bool> TableExistsAsync(PosDbContext db, string tableName, CancellationToken cancellationToken)
