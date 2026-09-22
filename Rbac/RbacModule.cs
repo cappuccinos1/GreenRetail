@@ -9,6 +9,7 @@ public static class RbacModule
         services.AddSingleton<IAuthorizationService, AuthorizationService>();
 
         services.AddTransient<IGetRbacExplorerDataQuery, GetRbacExplorerDataQuery>();
+        services.AddTransient<IGrantPermissionOverrideUseCase, GrantPermissionOverrideUseCase>();
 
         services.AddTransient<RbacExplorerViewModel>();
         services.AddTransient<RbacExplorerPage>();
