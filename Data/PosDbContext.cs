@@ -52,6 +52,8 @@ public class PosDbContext : DbContext
     public DbSet<PurchaseOrderLine> PurchaseOrderLines => Set<PurchaseOrderLine>();
     public DbSet<GoodsReceivedNote> GoodsReceivedNotes => Set<GoodsReceivedNote>();
     public DbSet<GoodsReceivedNoteLine> GoodsReceivedNoteLines => Set<GoodsReceivedNoteLine>();
+    public DbSet<ReceivingSession> ReceivingSessions => Set<ReceivingSession>();
+    public DbSet<ReceivingLine> ReceivingLines => Set<ReceivingLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -165,5 +167,15 @@ public class PosDbContext : DbContext
         modelBuilder.Entity<GoodsReceivedNote>().HasOne(x => x.PurchaseOrder).WithMany().HasForeignKey(x => x.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<GoodsReceivedNote>().HasMany(x => x.Lines).WithOne(x => x.GoodsReceivedNote).HasForeignKey(x => x.GoodsReceivedNoteId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<GoodsReceivedNoteLine>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<ReceivingSession>().HasIndex(x => x.Number).IsUnique();
+        modelBuilder.Entity<ReceivingSession>().Property(x => x.Number).IsRequired();
+        modelBuilder.Entity<ReceivingSession>().HasIndex(x => new { x.BranchId, x.Status });
+        modelBuilder.Entity<ReceivingSession>().HasOne(x => x.Supplier).WithMany().HasForeignKey(x => x.SupplierId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ReceivingSession>().HasOne(x => x.PurchaseOrder).WithMany().HasForeignKey(x => x.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ReceivingSession>().HasOne(x => x.Branch).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ReceivingSession>().HasMany(x => x.Lines).WithOne(x => x.ReceivingSession).HasForeignKey(x => x.ReceivingSessionId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReceivingLine>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ReceivingLine>().HasIndex(x => new { x.ReceivingSessionId, x.ProductId }).IsUnique();
     }
 }

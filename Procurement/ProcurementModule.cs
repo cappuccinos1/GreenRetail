@@ -9,6 +9,10 @@ public static class ProcurementModule
         services.AddTransient<ICreateSupplierUseCase, CreateSupplierUseCase>();
         services.AddTransient<ICreatePurchaseOrderUseCase, CreatePurchaseOrderUseCase>();
         services.AddTransient<IPostGrnUseCase, PostGrnUseCase>();
+        services.AddTransient<IStartReceivingUseCase, StartReceivingUseCase>();
+        services.AddTransient<ICompleteQcUseCase, CompleteQcUseCase>();
+        services.AddTransient<IConfirmNoPoReceivingUseCase, ConfirmNoPoReceivingUseCase>();
+        services.AddTransient<IPostReceivingGrnUseCase, PostReceivingGrnUseCase>();
 
         services.AddTransient<IGetSuppliersQuery, GetSuppliersQuery>();
         services.AddTransient<IGetActivePurchaseOrdersQuery, GetActivePurchaseOrdersQuery>();

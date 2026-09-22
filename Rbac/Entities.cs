@@ -35,6 +35,7 @@ public static class PermissionCodes
     // Receiving / QC. QC never writes stock directly.
     public const string ReceivingGrnPost = "receiving.grn.post";
     public const string ReceivingInvoiceWithoutPo = "receiving.invoice_without_po";
+    public const string ReceivingNoPoConfirm = "receiving.no_po.confirm";
     public const string QcInspect = "qc.inspect";
     public const string QcApprove = "qc.approve";
 
@@ -81,7 +82,7 @@ public static class PermissionCodes
         InventorySupplierManage, InventoryTransferCreate, InventoryTransferApprove,
         InventoryNegativeStockAllow, InventoryQuarantineManage,
         PurchasingPoCreate, PurchasingPoView,
-        ReceivingGrnPost, ReceivingInvoiceWithoutPo,
+        ReceivingGrnPost, ReceivingInvoiceWithoutPo, ReceivingNoPoConfirm,
         QcInspect, QcApprove,
         CashCount, CashVarianceApprove, CashDepositRecord,
         FinanceView, FinanceStatementPrepare, FinanceOrganisationStatementPrepare,

@@ -1124,6 +1124,120 @@ namespace GreenRetail.Migrations
                     b.ToTable("Suppliers");
                 });
 
+
+            modelBuilder.Entity("GreenRetail.Procurement.ReceivingSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("InspectionCompletedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("InspectedByUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("NoPoBuyerConfirmedByUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("NoPoBuyerConfirmedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PostedByUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("PostedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PurchaseOrderId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ReceivedByUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ReceivedUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("SupplierId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("VendorInvoiceDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VendorInvoiceNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId", "Status");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("ReceivingSessions");
+                });
+
+            modelBuilder.Entity("GreenRetail.Procurement.ReceivingLine", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("AcceptedQuantity")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BatchNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("DeliveredQuantity")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ExpiryUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RejectReason")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("RejectedQuantity")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ReceivingSessionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UnitCostKobo")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ReceivingSessionId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("ReceivingLines");
+                });
+
             modelBuilder.Entity("GreenRetail.Rbac.Permission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1150,6 +1264,52 @@ namespace GreenRetail.Migrations
                         .IsUnique();
 
                     b.ToTable("Permissions");
+                });
+
+
+            modelBuilder.Entity("GreenRetail.Procurement.ReceivingLine", b =>
+                {
+                    b.HasOne("GreenRetail.Data.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GreenRetail.Procurement.ReceivingSession", "ReceivingSession")
+                        .WithMany("Lines")
+                        .HasForeignKey("ReceivingSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ReceivingSession");
+                });
+
+            modelBuilder.Entity("GreenRetail.Procurement.ReceivingSession", b =>
+                {
+                    b.HasOne("GreenRetail.Data.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GreenRetail.Procurement.PurchaseOrder", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("GreenRetail.Procurement.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("Supplier");
                 });
 
             modelBuilder.Entity("GreenRetail.Rbac.PermissionOverride", b =>
@@ -1944,6 +2104,11 @@ namespace GreenRetail.Migrations
                 });
 
             modelBuilder.Entity("GreenRetail.Procurement.PurchaseOrder", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("GreenRetail.Procurement.ReceivingSession", b =>
                 {
                     b.Navigation("Lines");
                 });

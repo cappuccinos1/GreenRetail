@@ -160,17 +160,19 @@ public static class RbacSeeder
         [RoleNames.Buyer] = new[]
         {
             PermissionCodes.PurchasingPoCreate,
-            PermissionCodes.PurchasingPoView
+            PermissionCodes.PurchasingPoView,
+            PermissionCodes.ReceivingNoPoConfirm
         },
         [RoleNames.ProcurementHead] = new[]
         {
             PermissionCodes.PurchasingPoCreate,
-            PermissionCodes.PurchasingPoView
+            PermissionCodes.PurchasingPoView,
+            PermissionCodes.ReceivingNoPoConfirm
         },
 
         // QC inspects; it never writes stock. Inventory posts the accepted GRN.
-        [RoleNames.QCOfficer] = new[] { PermissionCodes.QcInspect },
-        [RoleNames.QCHead] = new[] { PermissionCodes.QcInspect, PermissionCodes.QcApprove },
+        [RoleNames.QCOfficer] = new[] { PermissionCodes.QcInspect, PermissionCodes.ReceivingInvoiceWithoutPo },
+        [RoleNames.QCHead] = new[] { PermissionCodes.QcInspect, PermissionCodes.QcApprove, PermissionCodes.ReceivingInvoiceWithoutPo },
 
         // Cash and financial visibility belong to Accounts.
         [RoleNames.AccountsOfficer] = new[]

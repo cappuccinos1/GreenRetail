@@ -43,7 +43,6 @@ public sealed class Result<T> : Result
         : throw new InvalidOperationException("Cannot access Value when result is not successful.");
 
     public static Result<T> Ok(T value) => new(value, true, null, ResultErrorCode.None);
-    public new static Result<T> Fail(string error) => new(default, false, error, ResultErrorCode.BusinessRule);
-    public static Result<T> Fail(string error, ResultErrorCode errorCode)
+    public new static Result<T> Fail(string error, ResultErrorCode errorCode = ResultErrorCode.BusinessRule)
         => new(default, false, error, errorCode);
 }
