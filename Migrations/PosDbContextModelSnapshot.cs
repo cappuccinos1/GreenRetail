@@ -468,6 +468,16 @@ namespace GreenRetail.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("GreenRetail.Data.Entities.Terminal", b =>
+                {
+                    b.HasOne("GreenRetail.Data.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Branch");
+                });
+
             modelBuilder.Entity("GreenRetail.Data.Entities.Payment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -766,6 +776,9 @@ namespace GreenRetail.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("BranchId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -781,6 +794,8 @@ namespace GreenRetail.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
 
                     b.HasIndex("Code")
                         .IsUnique();

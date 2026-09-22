@@ -9,28 +9,24 @@
              Shell.FlyoutBehavior="Disabled">
 
     <Grid Padding="24">
-
         <VerticalStackLayout WidthRequest="340"
                              HorizontalOptions="Center"
                              VerticalOptions="Center"
                              Spacing="12">
-
             <Label Text="Green Retail"
                    FontSize="28"
                    FontAttributes="Bold"
                    HorizontalOptions="Center" />
 
             <Label Text="Username" />
-
             <Entry x:Name="UserNameEntry"
                    Text="{Binding UserName}"
-                   Placeholder="owner, manager, or cashier"
+                   Placeholder="Username"
                    ReturnType="Next"
                    Completed="OnUserNameCompleted"
                    Keyboard="Text" />
 
             <Label Text="Password" />
-
             <Entry x:Name="PasswordEntry"
                    Text="{Binding Password}"
                    Placeholder="Password"
@@ -46,11 +42,6 @@
 
             <Label Text="{Binding ErrorMessage}"
                    TextColor="Red" />
-
-            <Label Text="Dev logins: owner / Owner!123, manager / Manager!123, cashier / Cashier!123"
-                   FontSize="12"
-                   TextColor="Gray"
-                   HorizontalOptions="Center" />
         </VerticalStackLayout>
     </Grid>
 </ContentPage>

@@ -16,7 +16,13 @@ public sealed class CartService : ObservableObject, ICartService
         private set => SetProperty(ref _subtotal, value);
     }
 
+
     public void Add(Guid productId, string name, Money unitPrice, bool isWeighed, decimal quantity = 1m)
+    {
+        Add(productId, name, unitPrice.ToNaira(), isWeighed, quantity);
+    }
+
+    public void Add(Guid productId, string name, decimal unitPriceNaira, bool isWeighed, decimal quantity = 1m)
     {
         if (quantity <= 0m)
             quantity = 1m;
@@ -34,10 +40,16 @@ public sealed class CartService : ObservableObject, ICartService
         }
         else
         {
-            Lines.Add(new CartLine(productId, name, unitPrice, quantity, isWeighed));
+            Lines.Add(new CartLine(
+                productId,
+                name,
+                unitPriceNaira,
+                quantity,
+                isWeighed));
         }
 
         Recalculate();
+        OnPropertyChanged(nameof(Lines));
     }
 
     public void Remove(Guid productId)
@@ -48,13 +60,17 @@ public sealed class CartService : ObservableObject, ICartService
             return;
 
         Lines.Remove(existing);
+
         Recalculate();
+        OnPropertyChanged(nameof(Lines));
     }
 
     public void Clear()
     {
         Lines.Clear();
+
         Recalculate();
+        OnPropertyChanged(nameof(Lines));
     }
 
     private void Recalculate()

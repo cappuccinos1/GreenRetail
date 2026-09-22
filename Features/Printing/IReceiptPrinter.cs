@@ -4,5 +4,5 @@ namespace GreenRetail.Features.Printing;
 
 public interface IReceiptPrinter
 {
-    Task PrintAsync(CompletedSale sale, CancellationToken cancellationToken = default);
+    Task PrintAsync(CreatedSaleResult sale, CancellationToken cancellationToken = default);
 }

@@ -1,155 +1,110 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GreenRetail.Core.Abstractions;
+using GreenRetail.Core.Terminal;
 using GreenRetail.Core.ValueObjects;
+using GreenRetail.Data.Entities;
 using GreenRetail.Shared.State;
 
 namespace GreenRetail.Features.CashSessions;
 
 public partial class CashSessionViewModel : ObservableObject
 {
-    private readonly IGetOpenCashSessionQuery _getOpenSession;
-    private readonly IOpenCashSessionUseCase _openSession;
-    private readonly ICloseCashSessionUseCase _closeSession;
+    private readonly IGetActiveSessionQuery _getActiveSession;
+    private readonly IOpenRegisterUseCase _openRegister;
+    private readonly ICloseRegisterUseCase _closeRegister;
     private readonly ICurrentUserService _currentUser;
+    private readonly ITerminalContext _terminalContext;
 
-    [ObservableProperty]
-    private string openingCashInput = "0";
+    [ObservableProperty] private string statusMessage = string.Empty;
+    [ObservableProperty] private string openingCashText = "0";
+    [ObservableProperty] private string countedCashText = "0";
+    [ObservableProperty] private bool isSessionOpen = false;
+    [ObservableProperty] private CashSession? currentSession;
 
-    [ObservableProperty]
-    private string countedCashInput = "0";
-
-    [ObservableProperty]
-    private string sessionStatus = "No open cash session";
-
-    [ObservableProperty]
-    private string statusMessage = string.Empty;
-
-    [ObservableProperty]
-    private Money expectedCash;
-
-    [ObservableProperty]
-    private Money variance;
-
-    [ObservableProperty]
-    private bool isBusy;
+    public ObservableCollection<CashSession> RecentSessions { get; } = new();
 
     public CashSessionViewModel(
-        IGetOpenCashSessionQuery getOpenSession,
-        IOpenCashSessionUseCase openSession,
-        ICloseCashSessionUseCase closeSession,
-        ICurrentUserService currentUser)
+        IGetActiveSessionQuery getActiveSession,
+        IOpenRegisterUseCase openRegister,
+        ICloseRegisterUseCase closeRegister,
+        ICurrentUserService currentUser,
+        ITerminalContext terminalContext)
     {
-        _getOpenSession = getOpenSession;
-        _openSession = openSession;
-        _closeSession = closeSession;
+        _getActiveSession = getActiveSession;
+        _openRegister = openRegister;
+        _closeRegister = closeRegister;
         _currentUser = currentUser;
+        _terminalContext = terminalContext;
     }
 
     public async Task InitializeAsync()
     {
-        await RefreshAsync();
+        await RefreshSessionStatusAsync();
     }
 
-    [RelayCommand]
-    private async Task RefreshAsync()
+    private async Task RefreshSessionStatusAsync()
     {
-        try
+        var result = await _getActiveSession.ExecuteAsync(_terminalContext.TerminalId);
+        if (result.IsSuccess && result.Value != null)
         {
-            IsBusy = true;
-
-            var result = await _getOpenSession.ExecuteAsync(new EmptyRequest());
-
-            if (!result.IsSuccess)
-            {
-                StatusMessage = result.Error ?? "Unable to load cash session.";
-                return;
-            }
-
-            var session = result.Value;
-
-            if (session is null)
-            {
-                SessionStatus = "No open cash session";
-                ExpectedCash = Money.Zero;
-                Variance = Money.Zero;
-                return;
-            }
-
-            SessionStatus = $"Open session: {session.CashierName}";
-            ExpectedCash = session.ExpectedCash;
-            Variance = session.Variance ?? Money.Zero;
+            CurrentSession = result.Value;
+            IsSessionOpen = true;
+            var expected = new Money(CurrentSession.ExpectedCashKobo);
+            StatusMessage = $"Session open for {CurrentSession.CashierName}. Expected Cash: {expected}";
         }
-        finally
+        else
         {
-            IsBusy = false;
+            CurrentSession = null;
+            IsSessionOpen = false;
+            StatusMessage = "No open session on this register.";
         }
     }
 
     [RelayCommand]
     private async Task OpenSessionAsync()
     {
-        try
+        if (!decimal.TryParse(OpeningCashText, out var cash) || cash < 0)
         {
-            IsBusy = true;
-            StatusMessage = string.Empty;
-
-            var opening = ParseMoney(OpeningCashInput);
-
-            var result = await _openSession.ExecuteAsync(new OpenCashSessionCommand(
-                opening,
-                _currentUser.UserId,
-                _currentUser.DisplayName ?? "Unknown"));
-
-            if (!result.IsSuccess)
-            {
-                StatusMessage = result.Error ?? "Unable to open cash session.";
-                return;
-            }
-
-            StatusMessage = "Cash session opened.";
-            await RefreshAsync();
+            StatusMessage = "Enter a valid opening cash amount.";
+            return;
         }
-        finally
-        {
-            IsBusy = false;
-        }
+
+        var cmd = new OpenRegisterCommand(
+            _currentUser.UserId ?? Guid.Empty,
+            _currentUser.DisplayName ?? "Unknown",
+            Money.FromNaira(cash).Kobo);
+
+        var result = await _openRegister.ExecuteAsync(cmd);
+        StatusMessage = result.IsSuccess ? "Session opened." : result.Error!;
+        if (result.IsSuccess) await RefreshSessionStatusAsync();
     }
 
     [RelayCommand]
     private async Task CloseSessionAsync()
     {
-        try
+        if (!decimal.TryParse(CountedCashText, out var cash) || cash < 0)
         {
-            IsBusy = true;
-            StatusMessage = string.Empty;
-
-            var counted = ParseMoney(CountedCashInput);
-
-            var result = await _closeSession.ExecuteAsync(new CloseCashSessionCommand(
-                counted,
-                _currentUser.UserId,
-                _currentUser.DisplayName ?? "Unknown"));
-
-            if (!result.IsSuccess)
-            {
-                StatusMessage = result.Error ?? "Unable to close cash session.";
-                return;
-            }
-
-            StatusMessage = $"Cash session closed. Variance {result.Value.Variance}.";
-            await RefreshAsync();
+            StatusMessage = "Enter a valid counted cash amount.";
+            return;
         }
-        finally
+
+        var cmd = new CloseRegisterCommand(
+            _currentUser.UserId ?? Guid.Empty,
+            Money.FromNaira(cash).Kobo);
+
+        var result = await _closeRegister.ExecuteAsync(cmd);
+        if (result.IsSuccess)
         {
-            IsBusy = false;
+            var variance = result.Value.VarianceKobo ?? 0;
+            var varianceMoney = new Money(variance);
+            StatusMessage = $"Session closed. Variance: {varianceMoney}";
         }
-    }
-
-    private static Money ParseMoney(string value)
-    {
-        return decimal.TryParse(value, out var result)
-            ? Money.FromNaira(result)
-            : Money.Zero;
+        else
+        {
+            StatusMessage = result.Error!;
+        }
+        
+        if (result.IsSuccess) await RefreshSessionStatusAsync();
     }
 }

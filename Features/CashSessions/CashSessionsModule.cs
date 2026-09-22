@@ -6,9 +6,9 @@ public static class CashSessionsModule
 {
     public static IServiceCollection AddCashSessionsFeature(this IServiceCollection services)
     {
-        services.AddTransient<IOpenCashSessionUseCase, OpenCashSessionUseCase>();
-        services.AddTransient<ICloseCashSessionUseCase, CloseCashSessionUseCase>();
-        services.AddTransient<IGetOpenCashSessionQuery, GetOpenCashSessionQuery>();
+        services.AddTransient<IOpenRegisterUseCase, OpenRegisterUseCase>();
+        services.AddTransient<ICloseRegisterUseCase, CloseRegisterUseCase>();
+        services.AddTransient<IGetActiveSessionQuery, GetActiveSessionQuery>();
 
         services.AddTransient<CashSessionViewModel>();
         services.AddTransient<CashSessionPage>();

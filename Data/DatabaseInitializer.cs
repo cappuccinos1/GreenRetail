@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using GreenRetail.Accounting;
 using GreenRetail.Data.Entities;
 using GreenRetail.Features.Auth;
@@ -60,11 +61,28 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
 
     private async Task SeedTerminalAsync(PosDbContext db, CancellationToken cancellationToken)
     {
-        if (await db.Terminals.AnyAsync(cancellationToken))
+        var activeBranchIds = await db.Branches
+            .Where(x => x.IsActive)
+            .Select(x => x.Id)
+            .ToListAsync(cancellationToken);
+
+        if (activeBranchIds.Count != 1)
+            throw new InvalidOperationException("Terminal setup requires exactly one active branch until a terminal is explicitly assigned to a branch.");
+
+        var existing = await db.Terminals.FirstOrDefaultAsync(cancellationToken);
+        if (existing is not null)
+        {
+            if (existing.BranchId is null)
+            {
+                existing.BranchId = activeBranchIds[0];
+                await db.SaveChangesAsync(cancellationToken);
+            }
             return;
+        }
 
         db.Terminals.Add(new Terminal
         {
+            BranchId = activeBranchIds[0],
             Name = "Main Register",
             Code = "REG-01",
             IsActive = true,
@@ -79,12 +97,24 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
         if (await db.Users.AnyAsync(cancellationToken))
             return;
 
+#if DEBUG
         var users = new[]
         {
             ("owner", "Owner", "Owner", "Owner!123"),
             ("manager", "Manager", "Manager", "Manager!123"),
             ("cashier", "Cashier", "Cashier", "Cashier!123")
         };
+#else
+        // Never ship a known production password. The first owner receives a
+        // random one-time bootstrap password in a local file and must change it.
+        var temporaryPassword = GenerateTemporaryPassword();
+        var users = new[]
+        {
+            ("owner", "Owner", "Owner", temporaryPassword)
+        };
+
+        WriteInitialOwnerCredentials("owner", temporaryPassword);
+#endif
 
         foreach (var (userName, displayName, role, password) in users)
         {
@@ -105,6 +135,34 @@ public sealed class DatabaseInitializer : IDatabaseInitializer
 
         await db.SaveChangesAsync(cancellationToken);
     }
+
+#if !DEBUG
+    private static string GenerateTemporaryPassword()
+    {
+        const string alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
+        var chars = new char[24];
+        for (var i = 0; i < chars.Length; i++)
+            chars[i] = alphabet[RandomNumberGenerator.GetInt32(alphabet.Length)];
+
+        return new string(chars);
+    }
+
+    private static void WriteInitialOwnerCredentials(string userName, string password)
+    {
+        var dir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "GreenRetail");
+        Directory.CreateDirectory(dir);
+
+        var path = Path.Combine(dir, "INITIAL_OWNER_CREDENTIALS.txt");
+        File.WriteAllText(path,
+            $"GREEN RETAIL INITIAL OWNER CREDENTIALS{Environment.NewLine}" +
+            $"Generated: {DateTime.UtcNow:O}{Environment.NewLine}{Environment.NewLine}" +
+            $"Username: {userName}{Environment.NewLine}" +
+            $"Temporary password: {password}{Environment.NewLine}{Environment.NewLine}" +
+            "Change this password immediately after first login, then delete this file.");
+    }
+#endif
 
     private async Task EnsureDevCredentialsAsync(PosDbContext db, CancellationToken cancellationToken)
     {

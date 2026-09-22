@@ -7,10 +7,11 @@ namespace GreenRetail.Features.Cart;
 public sealed record CartLine(
     Guid ProductId,
     string Name,
-    Money UnitPrice,
+    decimal Price,
     decimal Quantity,
     bool IsWeighed)
 {
+    public Money UnitPrice => Money.FromNaira(Price);
     public Money LineTotal => UnitPrice * Quantity;
 }
 
@@ -20,6 +21,7 @@ public interface ICartService : INotifyPropertyChanged
     Money Subtotal { get; }
 
     void Add(Guid productId, string name, Money unitPrice, bool isWeighed, decimal quantity = 1m);
+    void Add(Guid productId, string name, decimal unitPriceNaira, bool isWeighed, decimal quantity = 1m);
     void Remove(Guid productId);
     void Clear();
 }

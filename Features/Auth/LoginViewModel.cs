@@ -73,7 +73,10 @@ public partial class LoginViewModel : ObservableObject
             UserName = string.Empty;
             Password = string.Empty;
 
-            await _navigation.GoToDashboardAsync();
+            if (user.RequiresPasswordChange)
+                await _navigation.NavigateToAsync("change-password");
+            else
+                await _navigation.GoToDashboardAsync();
         }
         catch (Exception ex)
         {

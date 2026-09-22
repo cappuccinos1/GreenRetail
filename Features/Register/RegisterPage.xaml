@@ -12,20 +12,18 @@
 
     <Grid RowDefinitions="Auto, *, Auto">
         
-        <!-- Top Bar -->
+        <!-- Top Bar with Session Status -->
         <Grid Grid.Row="0" BackgroundColor="#1F2937" Padding="15" ColumnDefinitions="Auto, *, Auto">
             <Button Text="← Hub" Command="{Binding BackToHubCommand}" BackgroundColor="#374151" TextColor="White"/>
-            <Label Grid.Column="1" Text="REGISTER 01 | CASHIER: JOHN" TextColor="White" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
+            <Label Grid.Column="1" Text="{Binding SessionStatusText}" TextColor="White" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="Center"/>
             <Label Grid.Column="2" Text="{Binding StatusMessage}" TextColor="#10B981" VerticalOptions="Center"/>
         </Grid>
 
         <!-- Main Workspace -->
-        <Grid Grid.Row="1" ColumnDefinitions="*, 400" ColumnSpacing="0">
-            
+        <Grid Grid.Row="1" ColumnDefinitions="*, 400" ColumnSpacing="0" IsEnabled="{Binding IsSessionOpen}">
             <!-- Left: Scan & Search -->
             <Grid Grid.Column="0" Padding="20" RowDefinitions="Auto, *">
                 <Entry Grid.Row="0" Text="{Binding BarcodeInput}" Placeholder="Scan barcode or search..." FontSize="24" HeightRequest="60" BackgroundColor="#F3F4F6"/>
-                
                 <CollectionView Grid.Row="1" ItemsSource="{Binding SearchResults}" Margin="0,20,0,0">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="catalog:ProductSummary">
@@ -44,7 +42,6 @@
             <!-- Right: Ticket / Cart -->
             <Grid Grid.Column="1" BackgroundColor="#F9FAFB" Padding="20" RowDefinitions="Auto, *, Auto">
                 <Label Text="CURRENT TICKET" FontAttributes="Bold" FontSize="18" TextColor="#6B7280"/>
-                
                 <CollectionView Grid.Row="1" ItemsSource="{Binding Cart.Lines}" Margin="0,10,0,0">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="cart:CartLine">
@@ -56,7 +53,6 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
                 <VerticalStackLayout Grid.Row="2" Spacing="10">
                     <BoxView HeightRequest="1" Color="#E5E7EB"/>
                     <Grid ColumnDefinitions="*, Auto">
@@ -68,24 +64,30 @@
             </Grid>
         </Grid>
 
+        <!-- Session Open Overlay (Shows if Session is Closed) -->
+        <Grid Grid.RowSpan="3" BackgroundColor="#E0000000" IsVisible="{Binding IsSessionOpen, Converter={StaticResource InvertedBoolConverter}}">
+            <Border BackgroundColor="White" Padding="30" WidthRequest="400" VerticalOptions="Center" HorizontalOptions="Center">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Register Closed" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" TextColor="#EF4444"/>
+                    <Label Text="Opening Cash (Naira)" FontSize="16"/>
+                    <Entry Text="{Binding OpeningCashText}" Keyboard="Numeric" FontSize="20" Placeholder="e.g. 50000"/>
+                    <Button Text="Open Session" Command="{Binding OpenSessionCommand}" BackgroundColor="#10B981" TextColor="White" HeightRequest="50" FontAttributes="Bold"/>
+                    <Label Text="*Only Managers can open sessions" FontSize="12" TextColor="Gray" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
         <!-- Payment Modal Overlay -->
         <Grid Grid.RowSpan="3" BackgroundColor="#80000000" IsVisible="{Binding IsPaymentModalVisible}">
-            <Frame BackgroundColor="White" CornerRadius="16" Padding="30" WidthRequest="400" HeightRequest="500" VerticalOptions="Center" HorizontalOptions="Center">
+            <Border BackgroundColor="White" Padding="30" WidthRequest="400" HeightRequest="500" VerticalOptions="Center" HorizontalOptions="Center">
                 <VerticalStackLayout Spacing="20">
                     <Label Text="COMPLETE SALE" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center"/>
                     <Label Text="{Binding Cart.Subtotal, StringFormat='Total Due: {0}'}" FontSize="20" HorizontalOptions="Center"/>
-                    
                     <Entry Placeholder="Tendered Amount" Keyboard="Numeric" FontSize="24" HorizontalTextAlignment="Center"/>
-                    
-                    <Grid ColumnDefinitions="*, *" ColumnSpacing="20">
-                        <Button Grid.Column="0" Text="CASH" BackgroundColor="#3B82F6" TextColor="White" HeightRequest="50"/>
-                        <Button Grid.Column="1" Text="TRANSFER" BackgroundColor="#8B5CF6" TextColor="White" HeightRequest="50"/>
-                    </Grid>
-                    
-                    <Button Text="CONFIRM AND PRINT" Command="{Binding CompleteSaleCommand}" BackgroundColor="#10B981" TextColor="White" HeightRequest="60" FontAttributes="Bold"/>
+                    <Button Text="CONFIRM CASH" Command="{Binding CompleteSaleCommand}" BackgroundColor="#10B981" TextColor="White" HeightRequest="60" FontAttributes="Bold"/>
                     <Button Text="Cancel" Command="{Binding ClosePaymentModalCommand}" BackgroundColor="Transparent" TextColor="#EF4444"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
         </Grid>
     </Grid>
 </ContentPage>

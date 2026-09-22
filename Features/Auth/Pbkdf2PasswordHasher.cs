@@ -24,6 +24,17 @@ public sealed class Pbkdf2PasswordHasher : IPasswordHasher
         return (salt, hash);
     }
 
+    public bool IsValidPasswordPolicy(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password) || password.Length < 12 || password.Length > 128)
+            return false;
+
+        return password.Any(char.IsUpper)
+            && password.Any(char.IsLower)
+            && password.Any(char.IsDigit)
+            && password.Any(ch => !char.IsLetterOrDigit(ch));
+    }
+
     public bool Verify(string password, byte[] salt, byte[] hash)
     {
         if (string.IsNullOrWhiteSpace(password))

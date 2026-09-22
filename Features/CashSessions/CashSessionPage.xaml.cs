@@ -14,14 +14,6 @@ public partial class CashSessionPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
-        try
-        {
-            await _viewModel.InitializeAsync();
-        }
-        catch (Exception ex)
-        {
-            _viewModel.StatusMessage = $"Cash session error: {ex.Message}";
-        }
+        await _viewModel.InitializeAsync();
     }
 }

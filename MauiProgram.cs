@@ -40,8 +40,6 @@ public static class MauiProgram
         builder.Services.AddCartFeature();
         builder.Services.AddCatalogFeature();
         
-        builder.Services.AddTransient<ICreateSaleUseCase, CreateSaleUseCase>();
-        
         builder.Services.AddCheckoutFeature();
         builder.Services.AddCashSessionsFeature();
         builder.Services.AddReportsFeature();

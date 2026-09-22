@@ -1,194 +1,142 @@
 using Microsoft.EntityFrameworkCore;
 using GreenRetail.Core.Abstractions;
 using GreenRetail.Core.Results;
-using GreenRetail.Core.ValueObjects;
+using GreenRetail.Core.Terminal;
 using GreenRetail.Data;
 using GreenRetail.Data.Entities;
+using GreenRetail.Shared.State;
 
 namespace GreenRetail.Features.CashSessions;
 
-public sealed record CashSessionReadModel(
-    Guid Id,
-    string CashierName,
-    bool IsOpen,
-    Money OpeningCash,
-    Money ExpectedCash,
-    Money? CountedCash,
-    Money? Variance);
+// --- Queries ---
+public interface IGetActiveSessionQuery : IUseCase<Guid, Result<CashSession?>> { }
 
-public sealed record OpenCashSessionCommand(
-    Money OpeningCash,
-    Guid? CashierId,
-    string CashierName);
-
-public sealed record CloseCashSessionCommand(
-    Money CountedCash,
-    Guid? UserId,
-    string UserName);
-
-public interface IOpenCashSessionUseCase
-    : IUseCase<OpenCashSessionCommand, Result<CashSessionReadModel>>
+public sealed class GetActiveSessionQuery : IGetActiveSessionQuery
 {
-}
+    private readonly IDbContextFactory<PosDbContext> _dbFactory;
+    public GetActiveSessionQuery(IDbContextFactory<PosDbContext> dbFactory) => _dbFactory = dbFactory;
 
-public interface ICloseCashSessionUseCase
-    : IUseCase<CloseCashSessionCommand, Result<CashSessionReadModel>>
-{
-}
-
-public interface IGetOpenCashSessionQuery
-    : IUseCase<EmptyRequest, Result<CashSessionReadModel?>>
-{
-}
-
-internal static class CashSessionMapper
-{
-    public static CashSessionReadModel Map(CashSession session)
+    public async Task<Result<CashSession?>> ExecuteAsync(Guid terminalId, CancellationToken ct = default)
     {
-        return new CashSessionReadModel(
-            session.Id,
-            session.CashierName,
-            session.IsOpen,
-            Money.FromNaira(session.OpeningCash),
-            Money.FromNaira(session.ExpectedCash),
-            session.CountedCash.HasValue ? Money.FromNaira(session.CountedCash.Value) : null,
-            session.Variance.HasValue ? Money.FromNaira(session.Variance.Value) : null);
+        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
+            return Result<CashSession>.Fail("You must be signed in to close the register.");
+
+        if (_currentUser.Role is not ("Manager" or "Owner"))
+            return Result<CashSession>.Fail("Only a Manager or Owner can close the register.");
+
+        if (cmd.CountedCashKobo < 0)
+            return Result<CashSession>.Fail("Counted cash cannot be negative.");
+
+        await using var db = await _dbFactory.CreateDbContextAsync(ct);
+        var session = await db.CashSessions
+            .FirstOrDefaultAsync(x => x.TerminalId == terminalId && x.Status == CashSessionStatus.Open, ct);
+        return Result<CashSession?>.Ok(session);
     }
 }
 
-public sealed class OpenCashSessionUseCase : IOpenCashSessionUseCase
+// --- Open Register (Manager Only) ---
+public sealed record OpenRegisterCommand(Guid CashierId, string CashierName, long OpeningCashKobo); // legacy fields retained for caller compatibility; server uses signed-in user
+public interface IOpenRegisterUseCase : IUseCase<OpenRegisterCommand, Result<CashSession>> { }
+
+public sealed class OpenRegisterUseCase : IOpenRegisterUseCase
 {
-    private readonly IDbContextFactory<PosDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<PosDbContext> _dbFactory;
+    private readonly ITerminalContext _terminal;
+    private readonly ICurrentUserService _currentUser;
     private readonly IClock _clock;
 
-    public OpenCashSessionUseCase(
-        IDbContextFactory<PosDbContext> dbContextFactory,
-        IClock clock)
+    public OpenRegisterUseCase(IDbContextFactory<PosDbContext> dbFactory, ITerminalContext terminal, ICurrentUserService currentUser, IClock clock)
     {
-        _dbContextFactory = dbContextFactory;
+        _dbFactory = dbFactory;
+        _terminal = terminal;
+        _currentUser = currentUser;
         _clock = clock;
     }
 
-    public async Task<Result<CashSessionReadModel>> ExecuteAsync(
-        OpenCashSessionCommand command,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<CashSession>> ExecuteAsync(OpenRegisterCommand cmd, CancellationToken ct = default)
     {
-        if (command.OpeningCash.Kobo < 0)
-        {
-            return Result<CashSessionReadModel>.Fail("Opening cash cannot be negative.");
-        }
+        if (cmd.OpeningCashKobo < 0)
+            return Result<CashSession>.Fail("Opening cash cannot be negative.");
 
-        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
+            return Result<CashSession>.Fail("You must be signed in to open the register.");
 
-        var existing = await db.CashSessions
-            .FirstOrDefaultAsync(x => x.IsOpen, cancellationToken);
+        if (_currentUser.Role is not ("Manager" or "Owner"))
+            return Result<CashSession>.Fail("Only a Manager or Owner can open the register.");
 
-        if (existing is not null)
-        {
-            return Result<CashSessionReadModel>.Ok(CashSessionMapper.Map(existing));
-        }
+        await using var db = await _dbFactory.CreateDbContextAsync(ct);
+        
+        if (_terminal.BranchId is null)
+            return Result<CashSession>.Fail("This terminal is not assigned to a branch.");
+
+        var cashier = await db.Users.FirstOrDefaultAsync(x => x.Id == _currentUser.UserId.Value && x.IsActive, ct);
+        if (cashier is null)
+            return Result<CashSession>.Fail("The signed-in user is not an active cashier/manager account.");
+
+        // Rule: Only one open session per terminal
+        var existing = await db.CashSessions.AnyAsync(x => x.TerminalId == _terminal.TerminalId && x.Status == CashSessionStatus.Open, ct);
+        if (existing) return Result<CashSession>.Fail("A session is already open on this register.");
 
         var session = new CashSession
         {
-            CashierId = command.CashierId,
-            CashierName = command.CashierName,
-            OpeningCash = command.OpeningCash.ToNaira(),
-            ExpectedCash = command.OpeningCash.ToNaira(),
-            IsOpen = true,
+            TerminalId = _terminal.TerminalId,
+            BranchId = _terminal.BranchId.Value,
+            CashierId = cashier.Id,
+            CashierName = cashier.Name,
+            OpeningCashKobo = cmd.OpeningCashKobo,
+            ExpectedCashKobo = cmd.OpeningCashKobo,
+            Status = CashSessionStatus.Open,
             OpenedUtc = _clock.UtcNow
         };
 
         db.CashSessions.Add(session);
-
-        db.AuditLog.Add(new AuditLogEntry
-        {
-            CreatedUtc = _clock.UtcNow,
-            UserId = command.CashierId,
-            Action = "CashSessionOpened",
-            Details = $"Opening cash {command.OpeningCash}."
-        });
-
-        await db.SaveChangesAsync(cancellationToken);
-
-        return Result<CashSessionReadModel>.Ok(CashSessionMapper.Map(session));
+        await db.SaveChangesAsync(ct);
+        return Result<CashSession>.Ok(session);
     }
 }
 
-public sealed class CloseCashSessionUseCase : ICloseCashSessionUseCase
+// --- Close Register (Blind Count) ---
+public sealed record CloseRegisterCommand(Guid CountedByUserId, long CountedCashKobo); // legacy identity field retained; server uses signed-in user
+public interface ICloseRegisterUseCase : IUseCase<CloseRegisterCommand, Result<CashSession>> { }
+
+public sealed class CloseRegisterUseCase : ICloseRegisterUseCase
 {
-    private readonly IDbContextFactory<PosDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<PosDbContext> _dbFactory;
+    private readonly ITerminalContext _terminal;
+    private readonly ICurrentUserService _currentUser;
     private readonly IClock _clock;
 
-    public CloseCashSessionUseCase(
-        IDbContextFactory<PosDbContext> dbContextFactory,
-        IClock clock)
+    public CloseRegisterUseCase(IDbContextFactory<PosDbContext> dbFactory, ITerminalContext terminal, ICurrentUserService currentUser, IClock clock)
     {
-        _dbContextFactory = dbContextFactory;
+        _dbFactory = dbFactory;
+        _terminal = terminal;
+        _currentUser = currentUser;
         _clock = clock;
     }
 
-    public async Task<Result<CashSessionReadModel>> ExecuteAsync(
-        CloseCashSessionCommand command,
-        CancellationToken cancellationToken = default)
+    public async Task<Result<CashSession>> ExecuteAsync(CloseRegisterCommand cmd, CancellationToken ct = default)
     {
-        if (command.CountedCash.Kobo < 0)
-        {
-            return Result<CashSessionReadModel>.Fail("Counted cash cannot be negative.");
-        }
+        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
+            return Result<CashSession>.Fail("You must be signed in to close the register.");
 
-        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        if (_currentUser.Role is not ("Manager" or "Owner"))
+            return Result<CashSession>.Fail("Only a Manager or Owner can close the register.");
 
-        var session = await db.CashSessions
-            .FirstOrDefaultAsync(x => x.IsOpen, cancellationToken);
+        if (cmd.CountedCashKobo < 0)
+            return Result<CashSession>.Fail("Counted cash cannot be negative.");
 
-        if (session is null)
-        {
-            return Result<CashSessionReadModel>.Fail("No open cash session found.");
-        }
+        await using var db = await _dbFactory.CreateDbContextAsync(ct);
+        var session = await db.CashSessions.FirstOrDefaultAsync(x => x.TerminalId == _terminal.TerminalId && x.Status == CashSessionStatus.Open, ct);
+        
+        if (session is null) return Result<CashSession>.Fail("No open session found on this register.");
 
-        session.IsOpen = false;
-        session.CountedCash = command.CountedCash.ToNaira();
-        session.Variance = command.CountedCash.ToNaira() - session.ExpectedCash;
+        session.CountedCashKobo = cmd.CountedCashKobo;
+        session.VarianceKobo = cmd.CountedCashKobo - session.ExpectedCashKobo;
+        session.CountedByUserId = _currentUser.UserId.Value;
+        session.Status = CashSessionStatus.Closed;
         session.ClosedUtc = _clock.UtcNow;
 
-        db.AuditLog.Add(new AuditLogEntry
-        {
-            CreatedUtc = _clock.UtcNow,
-            UserId = command.UserId,
-            Action = "CashSessionClosed",
-            Details = $"Counted cash {command.CountedCash}. Variance {session.Variance}."
-        });
-
-        await db.SaveChangesAsync(cancellationToken);
-
-        return Result<CashSessionReadModel>.Ok(CashSessionMapper.Map(session));
-    }
-}
-
-public sealed class GetOpenCashSessionQuery : IGetOpenCashSessionQuery
-{
-    private readonly IDbContextFactory<PosDbContext> _dbContextFactory;
-
-    public GetOpenCashSessionQuery(IDbContextFactory<PosDbContext> dbContextFactory)
-    {
-        _dbContextFactory = dbContextFactory;
-    }
-
-    public async Task<Result<CashSessionReadModel?>> ExecuteAsync(
-        EmptyRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        await using var db = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-
-        var session = await db.CashSessions
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.IsOpen, cancellationToken);
-
-        if (session is null)
-        {
-            return Result<CashSessionReadModel?>.Ok(null);
-        }
-
-        return Result<CashSessionReadModel?>.Ok(CashSessionMapper.Map(session));
+        await db.SaveChangesAsync(ct);
+        return Result<CashSession>.Ok(session);
     }
 }

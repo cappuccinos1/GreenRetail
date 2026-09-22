@@ -12,7 +12,8 @@ public sealed record AuthenticatedUser(
     Guid Id,
     string UserName,
     string DisplayName,
-    string Role);
+    string Role,
+    bool RequiresPasswordChange);
 
 public interface IAuthenticateUserUseCase
     : IUseCase<AuthenticateUserCommand, Result<AuthenticatedUser>>
@@ -114,6 +115,7 @@ public sealed class AuthenticateUserUseCase : IAuthenticateUserUseCase
             user.Id,
             user.UserName,
             user.Name,
-            user.Role));
+            user.Role,
+            user.RequiresPasswordChange));
     }
 }

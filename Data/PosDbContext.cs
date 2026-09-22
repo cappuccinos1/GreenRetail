@@ -29,30 +29,24 @@ public class PosDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<SyncOutbox> SyncOutbox => Set<SyncOutbox>();
     public DbSet<AuditLogEntry> AuditLog => Set<AuditLogEntry>();
-
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<PermissionOverride> PermissionOverrides => Set<PermissionOverride>();
-
     public DbSet<StockAdjustmentRequest> StockAdjustmentRequests => Set<StockAdjustmentRequest>();
     public DbSet<StockOverrideRequest> StockOverrideRequests => Set<StockOverrideRequest>();
-
     public DbSet<StoreCreditVoucher> StoreCreditVouchers => Set<StoreCreditVoucher>();
     public DbSet<StoreCreditRedemption> StoreCreditRedemptions => Set<StoreCreditRedemption>();
     public DbSet<RefundRequest> RefundRequests => Set<RefundRequest>();
-
     public DbSet<ReceiptVerification> ReceiptVerifications => Set<ReceiptVerification>();
     public DbSet<SecurityIncident> SecurityIncidents => Set<SecurityIncident>();
-
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<FiscalPeriod> FiscalPeriods => Set<FiscalPeriod>();
     public DbSet<Journal> Journals => Set<Journal>();
     public DbSet<JournalLine> JournalLines => Set<JournalLine>();
     public DbSet<JournalSequence> JournalSequences => Set<JournalSequence>();
     public DbSet<SystemAccountSetting> SystemAccountSettings => Set<SystemAccountSetting>();
-
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
     public DbSet<PurchaseOrderLine> PurchaseOrderLines => Set<PurchaseOrderLine>();
@@ -63,128 +57,106 @@ public class PosDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Terminal>()
-            .HasIndex(x => x.Code).IsUnique();
-
-        modelBuilder.Entity<Branch>()
-            .HasIndex(x => x.Code).IsUnique();
+        modelBuilder.Entity<Terminal>().HasIndex(x => x.Code).IsUnique();
+        modelBuilder.Entity<Terminal>().HasOne(x => x.Branch).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Terminal>().HasIndex(x => x.BranchId);
+        modelBuilder.Entity<Branch>().HasIndex(x => x.Code).IsUnique();
         modelBuilder.Entity<Branch>().Property(x => x.Code).IsRequired();
         modelBuilder.Entity<Branch>().Property(x => x.Name).IsRequired();
-
         modelBuilder.Entity<AppUser>().HasIndex(x => x.UserName).IsUnique();
         modelBuilder.Entity<AppUser>().Property(x => x.UserName).IsRequired();
         modelBuilder.Entity<AppUser>().Property(x => x.Name).IsRequired();
         modelBuilder.Entity<AppUser>().Property(x => x.Role).IsRequired();
         modelBuilder.Entity<AppUser>().Property(x => x.PasswordSalt).IsRequired();
         modelBuilder.Entity<AppUser>().Property(x => x.PasswordHash).IsRequired();
-
         modelBuilder.Entity<Unit>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<Category>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<Product>().HasIndex(x => x.Sku).IsUnique();
         modelBuilder.Entity<Product>().HasOne(x => x.Category).WithMany().HasForeignKey(x => x.CategoryId);
         modelBuilder.Entity<Product>().HasOne(x => x.Unit).WithMany().HasForeignKey(x => x.UnitId);
-
         modelBuilder.Entity<Barcode>().HasIndex(x => x.Value).IsUnique();
         modelBuilder.Entity<Barcode>().HasOne(x => x.Product).WithMany(x => x.Barcodes).HasForeignKey(x => x.ProductId);
-
         modelBuilder.Entity<StockLevel>().HasIndex(x => x.ProductId).IsUnique();
         modelBuilder.Entity<StockLevel>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<StockLedgerEntry>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
 
+        // CashSession scoping
+        modelBuilder.Entity<CashSession>().HasOne(x => x.Terminal).WithMany().HasForeignKey(x => x.TerminalId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<CashSession>().HasOne(x => x.Branch).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<CashSession>().HasOne(x => x.Cashier).WithMany().HasForeignKey(x => x.CashierId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<CashSession>().HasOne(x => x.CountedByUser).WithMany().HasForeignKey(x => x.CountedByUserId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<CashSession>().HasIndex(x => new { x.TerminalId, x.Status });
 
-        modelBuilder.Entity<Sale>()
-            .HasIndex(x => x.IdempotencyKey).IsUnique();
+        modelBuilder.Entity<Sale>().HasIndex(x => x.IdempotencyKey).IsUnique();
         modelBuilder.Entity<Sale>().HasOne(x => x.Terminal).WithMany().HasForeignKey(x => x.TerminalId);
         modelBuilder.Entity<Sale>().HasOne(x => x.Customer).WithMany().HasForeignKey(x => x.CustomerId);
         modelBuilder.Entity<Sale>().HasOne(x => x.Cashier).WithMany().HasForeignKey(x => x.CashierId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<Sale>().HasOne(x => x.CashSession).WithMany().HasForeignKey(x => x.CashSessionId);
         modelBuilder.Entity<Sale>().HasMany(x => x.Items).WithOne(x => x.Sale).HasForeignKey(x => x.SaleId);
         modelBuilder.Entity<Sale>().HasMany(x => x.Payments).WithOne(x => x.Sale).HasForeignKey(x => x.SaleId);
-
         modelBuilder.Entity<SaleItem>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<Payment>().HasIndex(x => x.SaleId);
+        modelBuilder.Entity<Payment>().HasIndex(x => x.IdempotencyKey).IsUnique();
+        
         modelBuilder.Entity<SyncOutbox>().HasIndex(x => x.ProcessedUtc);
-
         modelBuilder.Entity<AuditLogEntry>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<AuditLogEntry>().HasIndex(x => x.CreatedUtc);
-
         modelBuilder.Entity<Role>().HasIndex(x => x.Name).IsUnique();
         modelBuilder.Entity<Role>().Property(x => x.Name).IsRequired();
-
         modelBuilder.Entity<Permission>().HasIndex(x => x.Code).IsUnique();
         modelBuilder.Entity<Permission>().Property(x => x.Code).IsRequired();
-
         modelBuilder.Entity<RolePermission>().HasIndex(x => new { x.RoleId, x.PermissionId }).IsUnique();
         modelBuilder.Entity<RolePermission>().HasOne(x => x.Role).WithMany().HasForeignKey(x => x.RoleId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<RolePermission>().HasOne(x => x.Permission).WithMany().HasForeignKey(x => x.PermissionId).OnDelete(DeleteBehavior.Cascade);
-
         modelBuilder.Entity<UserRole>().HasIndex(x => x.UserId);
         modelBuilder.Entity<UserRole>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<UserRole>().HasOne(x => x.Role).WithMany().HasForeignKey(x => x.RoleId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<UserRole>().HasOne(x => x.Branch).WithMany().HasForeignKey(x => x.BranchId).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<PermissionOverride>().HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<PermissionOverride>().HasOne(x => x.Permission).WithMany().HasForeignKey(x => x.PermissionId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<PermissionOverride>().HasOne(x => x.GrantedBy).WithMany().HasForeignKey(x => x.GrantedById).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<StockAdjustmentRequest>().HasIndex(x => x.Status);
         modelBuilder.Entity<StockAdjustmentRequest>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<StockAdjustmentRequest>().HasOne(x => x.RequestedBy).WithMany().HasForeignKey(x => x.RequestedById).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<StockAdjustmentRequest>().HasOne(x => x.ApprovedBy).WithMany().HasForeignKey(x => x.ApprovedById).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<StockOverrideRequest>().HasIndex(x => x.Status);
         modelBuilder.Entity<StockOverrideRequest>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<StockOverrideRequest>().HasOne(x => x.Cashier).WithMany().HasForeignKey(x => x.CashierId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<StockOverrideRequest>().HasOne(x => x.ResolvedBy).WithMany().HasForeignKey(x => x.ResolvedById).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<StoreCreditVoucher>().HasIndex(x => x.Code).IsUnique();
         modelBuilder.Entity<StoreCreditVoucher>().Property(x => x.Code).IsRequired();
         modelBuilder.Entity<StoreCreditRedemption>().HasOne(x => x.Voucher).WithMany().HasForeignKey(x => x.VoucherId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<StoreCreditRedemption>().HasOne(x => x.Sale).WithMany().HasForeignKey(x => x.SaleId).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<RefundRequest>().HasIndex(x => x.Status);
         modelBuilder.Entity<RefundRequest>().HasOne(x => x.Sale).WithMany().HasForeignKey(x => x.SaleId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<RefundRequest>().HasOne(x => x.CashierManager).WithMany().HasForeignKey(x => x.CashierManagerId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<RefundRequest>().HasOne(x => x.StoreCreditVoucher).WithMany().HasForeignKey(x => x.StoreCreditVoucherId).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<ReceiptVerification>().HasIndex(x => x.SaleId);
         modelBuilder.Entity<ReceiptVerification>().HasOne(x => x.Sale).WithMany().HasForeignKey(x => x.SaleId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<ReceiptVerification>().HasOne(x => x.VerifiedBy).WithMany().HasForeignKey(x => x.VerifiedById).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<SecurityIncident>().HasIndex(x => x.CreatedUtc);
         modelBuilder.Entity<SecurityIncident>().HasOne(x => x.Sale).WithMany().HasForeignKey(x => x.SaleId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<SecurityIncident>().HasOne(x => x.ReportedBy).WithMany().HasForeignKey(x => x.ReportedById).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<Account>().HasIndex(x => x.Code).IsUnique();
         modelBuilder.Entity<Account>().Property(x => x.Code).IsRequired();
         modelBuilder.Entity<Account>().Property(x => x.Name).IsRequired();
         modelBuilder.Entity<Account>().HasOne(x => x.Parent).WithMany(x => x.Children).HasForeignKey(x => x.ParentId);
-
         modelBuilder.Entity<FiscalPeriod>().HasIndex(x => new { x.Year, x.PeriodNumber }).IsUnique();
-
         modelBuilder.Entity<Journal>().HasIndex(x => x.Number).IsUnique();
         modelBuilder.Entity<Journal>().Property(x => x.Number).IsRequired();
         modelBuilder.Entity<Journal>().HasMany(x => x.Lines).WithOne(x => x.Journal).HasForeignKey(x => x.JournalId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<JournalLine>().HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId);
-
         modelBuilder.Entity<JournalSequence>().HasIndex(x => x.Prefix).IsUnique();
         modelBuilder.Entity<JournalSequence>().Property(x => x.Prefix).IsRequired();
-
         modelBuilder.Entity<SystemAccountSetting>().HasIndex(x => x.Key).IsUnique();
         modelBuilder.Entity<SystemAccountSetting>().Property(x => x.Key).IsRequired();
         modelBuilder.Entity<SystemAccountSetting>().HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId);
-
         modelBuilder.Entity<Supplier>().Property(x => x.Name).IsRequired();
-
         modelBuilder.Entity<PurchaseOrder>().HasIndex(x => x.Number).IsUnique();
         modelBuilder.Entity<PurchaseOrder>().Property(x => x.Number).IsRequired();
         modelBuilder.Entity<PurchaseOrder>().HasOne(x => x.Supplier).WithMany().HasForeignKey(x => x.SupplierId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<PurchaseOrder>().HasMany(x => x.Lines).WithOne(x => x.PurchaseOrder).HasForeignKey(x => x.PurchaseOrderId).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<PurchaseOrderLine>().HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<GoodsReceivedNote>().HasIndex(x => x.Number).IsUnique();
         modelBuilder.Entity<GoodsReceivedNote>().Property(x => x.Number).IsRequired();
         modelBuilder.Entity<GoodsReceivedNote>().HasOne(x => x.Supplier).WithMany().HasForeignKey(x => x.SupplierId).OnDelete(DeleteBehavior.Restrict);

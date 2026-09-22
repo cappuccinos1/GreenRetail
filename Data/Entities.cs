@@ -56,7 +56,7 @@ public class Product
     public decimal CostPrice { get; set; }
     public decimal SellingPrice { get; set; }
     public bool TrackStock { get; set; } = true;
-    public bool AllowNegativeStock { get; set; } = true;
+    public bool AllowNegativeStock { get; set; } = false;
     public bool IsWeighed { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime? ExpiryUtc { get; set; }
