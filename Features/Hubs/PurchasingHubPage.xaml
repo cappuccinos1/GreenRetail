@@ -1,14 +1,60 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.PurchasingHubPage" Title="Purchasing" BackgroundColor="#F3F4F6">
-    <ScrollView><VerticalStackLayout Padding="28" Spacing="18">
-        <Label Text="Purchasing" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
-        <Label Text="Purchase orders and buyer-controlled purchasing functions" FontSize="16" TextColor="#6B7280" />
-        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
-            <Button Text="Purchase Orders" Clicked="OnProcurementClicked" HeightRequest="90" />
-            <Button Grid.Column="1" Text="Active POs" Clicked="OnProcurementClicked" HeightRequest="90" />
-            <Button Grid.Row="1" Text="PO Line Management" Clicked="OnProcurementClicked" HeightRequest="90" />
-            <Button Grid.Row="1" Grid.Column="1" Text="Purchasing History" Clicked="OnProcurementClicked" HeightRequest="90" />
-        </Grid>
-        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><Label Text="Purchasing raises and manages purchase orders. Receiving and Quality Control are a separate operational workflow." TextColor="#6B7280" /></Border>
-    </VerticalStackLayout></ScrollView>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GreenRetail.Features.Hubs.PurchasingHubPage"
+             Title="Purchasing" BackgroundColor="#F3F4F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="28" Spacing="18">
+            <Label Text="Purchasing" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+            <Label Text="Purchase orders and buyer-controlled purchasing functions" FontSize="16" TextColor="#6B7280" />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
+                <Border Grid.Row="0" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="procurement" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Purchase Orders" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Create and manage purchase orders" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="procurement" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Active POs" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Review current purchase orders" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="procurement" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="PO Line Management" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Manage purchase order lines" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="procurement" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Purchasing History" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Review purchasing activity" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+            <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
+                <Label Text="Select an action above to open the live workspace. Permissions are still enforced by the underlying use cases." TextColor="#6B7280" />
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

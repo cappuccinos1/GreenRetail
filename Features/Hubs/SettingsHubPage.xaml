@@ -1,14 +1,60 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.SettingsHubPage" Title="Settings" BackgroundColor="#F3F4F6">
-    <ScrollView><VerticalStackLayout Padding="28" Spacing="18">
-        <Label Text="Settings &amp; Administration" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
-        <Label Text="System setup, access administration and controlled configuration" FontSize="16" TextColor="#6B7280" />
-        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
-            <Button Text="System Setup" Clicked="OnSetupClicked" HeightRequest="90" />
-            <Button Grid.Column="1" Text="Roles &amp; Permissions" Clicked="OnRbacClicked" HeightRequest="90" />
-            <Button Grid.Row="1" Text="Change Password" Clicked="OnPasswordClicked" HeightRequest="90" />
-            <Button Grid.Row="1" Grid.Column="1" Text="System Diagnostics" Clicked="OnSetupClicked" HeightRequest="90" />
-        </Grid>
-        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><Label Text="HR requests users and role changes; IT creates logins and implements access. Sensitive role changes can be subject to dual approval." TextColor="#6B7280" /></Border>
-    </VerticalStackLayout></ScrollView>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GreenRetail.Features.Hubs.SettingsHubPage"
+             Title="Settings &amp; Administration" BackgroundColor="#F3F4F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="28" Spacing="18">
+            <Label Text="Settings &amp; Administration" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+            <Label Text="System setup, access administration and controlled configuration" FontSize="16" TextColor="#6B7280" />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
+                <Border Grid.Row="0" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="system-setup" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="System Setup" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Create branches and POS terminals" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="rbac-explorer" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Roles &amp; Permissions" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Review roles and permissions" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="change-password" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Change Password" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Change the current user password" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="system-setup" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="System Diagnostics" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Open system setup and diagnostics" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+            <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
+                <Label Text="Select an action above to open the live workspace. Permissions are still enforced by the underlying use cases." TextColor="#6B7280" />
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

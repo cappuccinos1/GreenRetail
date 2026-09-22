@@ -60,7 +60,7 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
             </CollectionView>
-            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12" MaximumWidthRequest="650">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12" MaximumWidthRequest="650" InputTransparent="True">
                 <Label Text="{Binding EmptyStateMessage}"
                    IsVisible="{Binding EmptyStateMessage, Converter={StaticResource StringNotEmptyConverter}}"
                    TextColor="#6B7280"

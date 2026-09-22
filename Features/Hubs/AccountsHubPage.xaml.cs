@@ -1,8 +1,22 @@
 namespace GreenRetail.Features.Hubs;
+
 public partial class AccountsHubPage : ContentPage
 {
     public AccountsHubPage() => InitializeComponent();
-    private async void OnTrialBalanceClicked(object s, EventArgs e) => await Shell.Current.GoToAsync("trial-balance");
-    private async void OnReportsClicked(object s, EventArgs e) => await Shell.Current.GoToAsync("trial-balance");
-    private async void OnCashClicked(object s, EventArgs e) => await Shell.Current.GoToAsync("cash-sessions");
+
+    private async void OnActionTapped(object? sender, TappedEventArgs e)
+    {
+        if (e.Parameter is not string route || string.IsNullOrWhiteSpace(route))
+            return;
+
+        try
+        {
+            await Shell.Current.GoToAsync(route);
+        }
+        catch (Exception ex)
+        {
+            App.LogCrash(ex);
+            await DisplayAlert("Navigation error", $"The requested workspace could not be opened.\n\n{ex.Message}", "OK");
+        }
+    }
 }

@@ -1,34 +1,26 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GreenRetail.Features.Hubs.QualityControlHubPage"
-             Title="Quality Control"
-             BackgroundColor="#F3F4F6">
+             Title="Quality Control" BackgroundColor="#F3F4F6">
     <ScrollView>
         <VerticalStackLayout Padding="28" Spacing="18">
             <Label Text="Quality Control" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
             <Label Text="Receive incoming goods and inspect every line before Inventory posts stock" FontSize="16" TextColor="#6B7280" />
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Receiving" FontSize="20" FontAttributes="Bold" />
-                        <Label Text="Record supplier delivery, invoice, products and delivered quantities." TextColor="#6B7280" />
-                        <Button Text="Open Receiving &amp; Quality Control" Clicked="OnReceivingClicked" />
-                    </VerticalStackLayout>
-                </Border>
-                <Border Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Inventory staging" FontSize="20" FontAttributes="Bold" />
-                        <Label Text="Accepted quantities remain staged until Inventory posts the GRN into stock." TextColor="#6B7280" />
-                        <Label Text="Inventory posting is intentionally outside Quality Control." TextColor="#6B7280" />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
+                <Border Grid.Row="0" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="quality-control-workflow" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Receiving &amp; Quality Control" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Record deliveries, inspect lines and stage accepted quantities" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
                     </VerticalStackLayout>
                 </Border>
             </Grid>
             <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Control boundary" FontAttributes="Bold" FontSize="16" />
-                    <Label Text="Quality Control records delivered, accepted and rejected quantities, expiry and batch information. It never changes StockLevels or StockLedger." TextColor="#6B7280" />
-                </VerticalStackLayout>
+                <Label Text="Select an action above to open the live workspace. Permissions are still enforced by the underlying use cases." TextColor="#6B7280" />
             </Border>
         </VerticalStackLayout>
     </ScrollView>

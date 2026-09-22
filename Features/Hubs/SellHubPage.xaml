@@ -1,20 +1,59 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.SellHubPage" Title="Sell" BackgroundColor="#F3F4F6">
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GreenRetail.Features.Hubs.SellHubPage"
+             Title="Sell" BackgroundColor="#F3F4F6">
     <ScrollView>
         <VerticalStackLayout Padding="28" Spacing="18">
             <Label Text="Sell" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
             <Label Text="Point of sale, till control and customer transactions" FontSize="16" TextColor="#6B7280" />
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
-                <Button Text="Open Register" Clicked="OnRegisterClicked" HeightRequest="90" />
-                <Button Grid.Column="1" Text="Till Management" Clicked="OnCashClicked" HeightRequest="90" />
-                <Button Grid.Row="1" Text="Refunds" Clicked="OnRefundsClicked" HeightRequest="90" />
-                <Button Grid.Row="1" Grid.Column="1" Text="Receipt / Security" Clicked="OnSecurityClicked" HeightRequest="90" />
+                <Border Grid.Row="0" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="register" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Open Register" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Start or resume point-of-sale operations" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="cash-sessions" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Till Management" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Open, close and count tills" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="refunds" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Refunds" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Controlled store-credit refund workflow" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="security" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Receipt / Security" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Receipt verification and security controls" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
             </Grid>
             <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Operating rule" FontAttributes="Bold" FontSize="16" />
-                    <Label Text="Cashiers sell through the register; Cashier Managers control tills and refunds. The underlying use cases enforce permissions even if a user reaches a screen directly." TextColor="#6B7280" />
-                </VerticalStackLayout>
+                <Label Text="Select an action above to open the live workspace. Permissions are still enforced by the underlying use cases." TextColor="#6B7280" />
             </Border>
         </VerticalStackLayout>
     </ScrollView>

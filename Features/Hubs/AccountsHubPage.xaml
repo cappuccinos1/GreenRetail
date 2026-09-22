@@ -1,14 +1,60 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="GreenRetail.Features.Hubs.AccountsHubPage" Title="Accounts" BackgroundColor="#F3F4F6">
-    <ScrollView><VerticalStackLayout Padding="28" Spacing="18">
-        <Label Text="Accounts &amp; Finance" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
-        <Label Text="Cash control, financial statements, reconciliations and accounting" FontSize="16" TextColor="#6B7280" />
-        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
-            <Button Text="Trial Balance" Clicked="OnTrialBalanceClicked" HeightRequest="90" />
-            <Button Grid.Column="1" Text="Sales Reports" Clicked="OnReportsClicked" HeightRequest="90" />
-            <Button Grid.Row="1" Text="Cash Sessions" Clicked="OnCashClicked" HeightRequest="90" />
-            <Button Grid.Row="1" Grid.Column="1" Text="Reconciliation" Clicked="OnTrialBalanceClicked" HeightRequest="90" />
-        </Grid>
-        <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18"><Label Text="Cash counts are blind and Accounts approves variances. Deposits remain an Accounts responsibility." TextColor="#6B7280" /></Border>
-    </VerticalStackLayout></ScrollView>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GreenRetail.Features.Hubs.AccountsHubPage"
+             Title="Accounts &amp; Finance" BackgroundColor="#F3F4F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="28" Spacing="18">
+            <Label Text="Accounts &amp; Finance" FontSize="32" FontAttributes="Bold" TextColor="#111827" />
+            <Label Text="Cash control, financial statements, reconciliations and accounting" FontSize="16" TextColor="#6B7280" />
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="16">
+                <Border Grid.Row="0" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="trial-balance" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Trial Balance" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Review the current trial balance" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="0" Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="trial-balance" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Sales Reports" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Open financial reporting workspace" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="0" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="cash-sessions" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Cash Sessions" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Manage cash closing and blind counts" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1" Padding="18" MinimumHeightRequest="120">
+                    <Border.Shadow><Shadow Brush="Black" Opacity="0.05" Radius="8" Offset="0,2" /></Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActionTapped" CommandParameter="trial-balance" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="Reconciliation" FontSize="19" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="Open the accounting/reconciliation workspace" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
+                        <Label Text="Open →" FontSize="13" FontAttributes="Bold" TextColor="#2563EB" Margin="0,4,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+            <Border BackgroundColor="White" Stroke="#E5E7EB" Padding="18">
+                <Label Text="Select an action above to open the live workspace. Permissions are still enforced by the underlying use cases." TextColor="#6B7280" />
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
