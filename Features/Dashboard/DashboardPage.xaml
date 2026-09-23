@@ -4,76 +4,46 @@
              xmlns:vm="clr-namespace:GreenRetail.Features.Dashboard"
              x:Class="GreenRetail.Features.Dashboard.DashboardPage"
              x:DataType="vm:DashboardViewModel"
-             Title="My Workspace"
+             Title="Dashboard"
              BackgroundColor="#F3F4F6"
              Shell.NavBarIsVisible="False">
+    <ScrollView>
+        <VerticalStackLayout Padding="28" Spacing="16">
+            <Border BackgroundColor="#FFFFFF" Stroke="#E5E7EB" StrokeThickness="1" Padding="24">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="20">
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="OPERATIONS CENTRE" FontSize="12" FontAttributes="Bold" TextColor="#6B7280" />
+                        <Label Text="{Binding Greeting}" FontSize="30" FontAttributes="Bold" TextColor="#111827" />
+                        <Label Text="{Binding Role, StringFormat='Role: {0}'}" FontSize="15" TextColor="#6B7280" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" VerticalOptions="Center" Spacing="3">
+                        <Label Text="GREENRETAIL" FontSize="12" FontAttributes="Bold" TextColor="#2563EB" HorizontalTextAlignment="End" />
+                        <Label Text="Daily workspace" FontSize="13" TextColor="#6B7280" HorizontalTextAlignment="End" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
 
-    <Grid RowDefinitions="Auto, *">
-        
-        <!-- Header -->
-        <Border Grid.Row="0" BackgroundColor="#10B981" Padding="30,40,30,30" StrokeThickness="0">
-            <VerticalStackLayout>
-                <Label Text="{Binding Greeting}" FontSize="28" FontAttributes="Bold" TextColor="White" />
-                <Label Text="{Binding Role, StringFormat='Role: {0}'}" FontSize="16" TextColor="#D1FAE5" Margin="0,5,0,0" />
-            </VerticalStackLayout>
-        </Border>
-
-        <!-- Workspace Tiles -->
-        <Grid Grid.Row="1" Margin="20">
-            <CollectionView ItemsSource="{Binding Tiles}">
-            <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="3" HorizontalItemSpacing="20" VerticalItemSpacing="20" />
-            </CollectionView.ItemsLayout>
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="vm:DashboardTile">
-                    <Border BackgroundColor="White" 
-                            Stroke="#E5E7EB" 
-                            StrokeThickness="1" 
-                            Padding="20" 
-                            HeightRequest="160">
-                        <Border.Shadow>
-                            <Shadow Brush="Black" Opacity="0.05" Radius="10" Offset="0,4" />
-                        </Border.Shadow>
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding BindingContext.NavigateToWorkspaceCommand, Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}}" 
-                                                  CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>
-                        
-                        <Grid RowDefinitions="Auto, *, Auto">
-                            <!-- Colored Icon Placeholder -->
-                            <Border Grid.Row="0" 
-                                    BackgroundColor="{Binding BackgroundColor}" 
-                                    WidthRequest="40" HeightRequest="40" 
-                                    StrokeThickness="0">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8" />
-                                </Border.StrokeShape>
-                                <Label Text="{Binding Title, Converter={StaticResource FirstLetterConverter}}" 
-                                       TextColor="White" FontSize="20" FontAttributes="Bold" 
-                                       HorizontalOptions="Center" VerticalOptions="Center" />
-                            </Border>
-
-                            <Label Grid.Row="1" Text="{Binding Title}" FontSize="18" FontAttributes="Bold" TextColor="#1F2937" Margin="0,15,0,0" />
-                            <Label Grid.Row="2" Text="{Binding Description}" FontSize="13" TextColor="#6B7280" LineBreakMode="WordWrap" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-            </CollectionView>
-            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12" MaximumWidthRequest="650">
-                <Label Text="{Binding EmptyStateMessage}"
-                   IsVisible="{Binding EmptyStateMessage, Converter={StaticResource StringNotEmptyConverter}}"
-                   TextColor="#6B7280"
-                   FontSize="16"
-                   HorizontalTextAlignment="Center"
-                   VerticalTextAlignment="Center"
-                   MaximumWidthRequest="650" />
-                <Label Text="{Binding InitializationError}"
-                       IsVisible="{Binding InitializationError, Converter={StaticResource StringNotEmptyConverter}}"
-                       TextColor="#B91C1C"
-                       FontSize="15"
-                       HorizontalTextAlignment="Center" />
-            </VerticalStackLayout>
-        </Grid>
-    </Grid>
+            <Border BackgroundColor="#FFFFFF" Stroke="#E5E7EB" StrokeThickness="1" Padding="18">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="AVAILABLE WORKSPACES" FontSize="12" FontAttributes="Bold" TextColor="#6B7280" />
+                    <Label Text="Your permissions determine which operational areas are available. The old tile wall has been replaced with a compact dashboard list." FontSize="14" TextColor="#4B5563" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Tiles}" Spacing="0">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DashboardTile">
+                                <Grid ColumnDefinitions="*,Auto" Padding="4,10" ColumnSpacing="14">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="#111827" />
+                                        <Label Text="{Binding Description}" FontSize="13" TextColor="#6B7280" />
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="1" Text="Open →" Command="{Binding BindingContext.NavigateToWorkspaceCommand, Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}}" CommandParameter="{Binding .}" BackgroundColor="White" TextColor="#2563EB" BorderColor="#BFDBFE" BorderWidth="1" CornerRadius="7" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                    <Label Text="{Binding EmptyStateMessage}" TextColor="#B45309" FontSize="13" IsVisible="{Binding EmptyStateMessage, Converter={StaticResource StringNotEmptyConverter}}" />
+                    <Label Text="{Binding InitializationError}" TextColor="#B91C1C" FontSize="13" IsVisible="{Binding InitializationError, Converter={StaticResource StringNotEmptyConverter}}" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

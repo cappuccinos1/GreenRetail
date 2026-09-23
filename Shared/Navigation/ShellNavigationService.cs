@@ -12,7 +12,7 @@ public sealed class ShellNavigationService : INavigationService
         => NavigateAsync("//dashboard"); // Home now means Dashboard
 
     public Task GoToCheckoutAsync()
-        => NavigateAsync("register");
+        => NavigateAsync("checkout");
 
     public Task GoToCashSessionAsync()
         => NavigateAsync("cash-sessions");

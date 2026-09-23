@@ -4,6 +4,7 @@ using GreenRetail.BackOffice;
 using GreenRetail.Core;
 using GreenRetail.Core.Terminal;
 using GreenRetail.Data;
+using GreenRetail.Features;
 using GreenRetail.Features.Auth;
 using GreenRetail.Features.Cart;
 using GreenRetail.Features.CashSessions;
@@ -56,6 +57,7 @@ public static class MauiProgram
         builder.Services.AddProcurementFeature();
 
         builder.Services.AddTransient<SellHubPage>();
+        builder.Services.AddTransient<PointOfSaleDashboardPage>();
         builder.Services.AddTransient<InventoryHubPage>();
         builder.Services.AddTransient<PurchasingHubPage>();
         builder.Services.AddTransient<QualityControlHubPage>();

@@ -4,6 +4,7 @@
        xmlns:auth="clr-namespace:GreenRetail.Features.Auth"
        xmlns:hubs="clr-namespace:GreenRetail.Features.Hubs"
        xmlns:dashboard="clr-namespace:GreenRetail.Features.Dashboard"
+       xmlns:features="clr-namespace:GreenRetail.Features"
        x:Class="GreenRetail.AppShell"
        FlyoutBehavior="Flyout"
        FlyoutWidth="280"
@@ -42,13 +43,13 @@
                   Shell.FlyoutBehavior="Disabled" />
 
     <!-- WORKSPACE DASHBOARD (Home) -->
-    <FlyoutItem Title="My Workspace" Icon="dotnet_bot.png" Route="dashboard">
+    <FlyoutItem Title="Dashboard" Icon="dotnet_bot.png" Route="dashboard">
         <ShellContent ContentTemplate="{DataTemplate dashboard:DashboardPage}" />
     </FlyoutItem>
 
     <!-- THE 7 FUNCTIONAL HUBS -->
-    <FlyoutItem Title="Sell" Icon="dotnet_bot.png" Route="sell">
-        <ShellContent ContentTemplate="{DataTemplate hubs:SellHubPage}" />
+    <FlyoutItem Title="Point of Sale" Icon="dotnet_bot.png" Route="point-of-sale">
+        <ShellContent ContentTemplate="{DataTemplate features:PointOfSaleDashboardPage}" />
     </FlyoutItem>
 
     <FlyoutItem Title="Inventory" Icon="dotnet_bot.png" Route="inventory">

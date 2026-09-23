@@ -2,7 +2,9 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GreenRetail.Data;
+using GreenRetail.Core.Terminal;
 using GreenRetail.Features.Cart;
+using GreenRetail.Features.CashSessions;
 using GreenRetail.Shared.Navigation;
 using GreenRetail.Shared.State;
 
@@ -15,11 +17,15 @@ public partial class PosViewModel : ObservableObject
     private readonly ICurrentUserService _currentUser;
     private readonly INavigationService _navigation;
     private readonly ICartService _cart;
+    private readonly IGetActiveSessionQuery _getActiveSession;
+    private readonly ITerminalContext _terminalContext;
 
     [ObservableProperty] private string? searchText;
     [ObservableProperty] private string statusMessage = string.Empty;
     [ObservableProperty] private string currentUserName = string.Empty;
     [ObservableProperty] private bool isBusy;
+    [ObservableProperty] private bool isSessionOpen;
+    [ObservableProperty] private string sessionStatusText = "Checking register status...";
     [ObservableProperty] private CartLine? selectedLine;
     [ObservableProperty] private string quantityInput = "—";
 
@@ -31,13 +37,17 @@ public partial class PosViewModel : ObservableObject
         ISearchProductsQuery searchProducts,
         ICurrentUserService currentUser,
         INavigationService navigation,
-        ICartService cart)
+        ICartService cart,
+        IGetActiveSessionQuery getActiveSession,
+        ITerminalContext terminalContext)
     {
         _startup = startup;
         _searchProducts = searchProducts;
         _currentUser = currentUser;
         _navigation = navigation;
         _cart = cart;
+        _getActiveSession = getActiveSession;
+        _terminalContext = terminalContext;
     }
 
     partial void OnSelectedLineChanged(CartLine? value)
@@ -59,6 +69,7 @@ public partial class PosViewModel : ObservableObject
             }
 
             CurrentUserName = _currentUser.DisplayName ?? "Unknown";
+            await CheckSessionAsync();
             await SearchAsync();
         }
         catch (Exception ex)
@@ -69,6 +80,17 @@ public partial class PosViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    private async Task CheckSessionAsync()
+    {
+        var result = await _getActiveSession.ExecuteAsync(_terminalContext.TerminalId);
+        IsSessionOpen = result.IsSuccess && result.Value?.Status == CashSessionStatus.Open;
+        SessionStatusText = IsSessionOpen
+            ? $"Register open · {result.Value!.CashierName}"
+            : result.IsSuccess && result.Value?.Status == CashSessionStatus.Counting
+                ? "Register is in blind-counting workflow."
+                : "Register closed · open a cash session before selling.";
     }
 
     [RelayCommand]
@@ -106,6 +128,12 @@ public partial class PosViewModel : ObservableObject
     [RelayCommand]
     private void AddToCart(ProductSummary product)
     {
+        if (!IsSessionOpen)
+        {
+            StatusMessage = "Register is not open. Open a cash session before selling.";
+            return;
+        }
+
         if (product is null)
             return;
 
@@ -211,6 +239,12 @@ public partial class PosViewModel : ObservableObject
     [RelayCommand]
     private async Task CheckoutAsync()
     {
+        if (!IsSessionOpen)
+        {
+            StatusMessage = "Register is not open. Open a cash session before checkout.";
+            return;
+        }
+
         if (_cart.Lines.Count == 0)
         {
             StatusMessage = "Current sale is empty.";

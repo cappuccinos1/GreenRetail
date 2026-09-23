@@ -57,7 +57,7 @@ public partial class DashboardViewModel : ObservableObject
         // Define all possible workspace tiles
         var allTiles = new List<DashboardTile>
         {
-            new("Cashier Register", "Process sales and scan items", "cart.png", "register", "#10B981"),
+            new("Cashier / Till", "Sell at the counter and process customer payments", "cart.png", "pos-cashier", "#10B981"),
             new("Till Management", "Open/close shifts and manage cashiers", "cash.png", "cash-sessions", "#3B82F6"),
             new("Inventory Ops", "Manage stock, catalogs, and adjustments", "box.png", "inventory-ops", "#8B5CF6"),
             new("Purchasing", "Raise POs and manage suppliers", "truck.png", "procurement", "#F59E0B"),

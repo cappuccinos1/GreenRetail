@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GreenRetail.Features.PointOfSaleDashboardPage"
+             Title="Point of Sale"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F3F4F6">
+    <ScrollView>
+        <VerticalStackLayout Padding="28" Spacing="16">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="20">
+                <VerticalStackLayout Spacing="3">
+                    <Label Text="POINT OF SALE" FontSize="12" FontAttributes="Bold" TextColor="#6B7280" />
+                    <Label Text="Today at the counter" FontSize="30" FontAttributes="Bold" TextColor="#111827" />
+                    <Label x:Name="OperatorLabel" FontSize="15" TextColor="#6B7280" />
+                </VerticalStackLayout>
+                <Button Grid.Column="1" Text="CASHIER / TILL →" Clicked="OnCashierClicked"
+                        BackgroundColor="#2563EB" TextColor="White" FontAttributes="Bold"
+                        CornerRadius="8" HeightRequest="52" Padding="18,0" />
+            </Grid>
+
+            <Border x:Name="SessionBanner" BackgroundColor="#FEF2F2" Stroke="#FECACA" StrokeThickness="1" Padding="16">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="14">
+                    <VerticalStackLayout Spacing="3">
+                        <Label x:Name="SessionTitle" Text="Register status" FontAttributes="Bold" FontSize="16" TextColor="#991B1B" />
+                        <Label x:Name="SessionDetail" Text="Checking the current cash session…" FontSize="13" TextColor="#7F1D1D" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="CASH SESSIONS" Clicked="OnCashSessionClicked"
+                            BackgroundColor="White" TextColor="#991B1B" BorderColor="#FCA5A5" BorderWidth="1" CornerRadius="7" />
+                </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
+                <Border Padding="16" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1">
+                    <VerticalStackLayout Spacing="4"><Label Text="TRANSACTIONS" FontSize="11" FontAttributes="Bold" TextColor="#6B7280"/><Label x:Name="TransactionsLabel" Text="—" FontSize="25" FontAttributes="Bold" TextColor="#111827"/><Label Text="today" FontSize="11" TextColor="#9CA3AF"/></VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" Padding="16" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1">
+                    <VerticalStackLayout Spacing="4"><Label Text="ITEMS SOLD" FontSize="11" FontAttributes="Bold" TextColor="#6B7280"/><Label x:Name="ItemsLabel" Text="—" FontSize="25" FontAttributes="Bold" TextColor="#111827"/><Label Text="today" FontSize="11" TextColor="#9CA3AF"/></VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="2" Padding="16" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1">
+                    <VerticalStackLayout Spacing="4"><Label Text="CASH PAYMENTS" FontSize="11" FontAttributes="Bold" TextColor="#6B7280"/><Label x:Name="CashLabel" Text="—" FontSize="25" FontAttributes="Bold" TextColor="#111827"/><Label Text="transactions" FontSize="11" TextColor="#9CA3AF"/></VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="3" Padding="16" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1">
+                    <VerticalStackLayout Spacing="4"><Label Text="CARD / TRANSFER" FontSize="11" FontAttributes="Bold" TextColor="#6B7280"/><Label x:Name="DigitalLabel" Text="—" FontSize="25" FontAttributes="Bold" TextColor="#111827"/><Label Text="transactions" FontSize="11" TextColor="#9CA3AF"/></VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <Border Padding="18" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="COUNTER WORK" FontSize="12" FontAttributes="Bold" TextColor="#6B7280" />
+                        <Button Text="Cashier / Sell" Clicked="OnCashierClicked" HorizontalOptions="Fill" />
+                        <Button Text="Cash Sessions / Drawer" Clicked="OnCashSessionClicked" HorizontalOptions="Fill" />
+                        <Button Text="Receipt / Security" Clicked="OnSecurityClicked" HorizontalOptions="Fill" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" Padding="18" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="OPERATING NOTES" FontSize="12" FontAttributes="Bold" TextColor="#6B7280" />
+                        <Label Text="• Sales are branch and terminal scoped.\n• The cashier screen requires an open cash session.\n• Payment posting remains server-side and permission checked.\n• Receipt/security tools remain available from this workspace." TextColor="#374151" FontSize="14" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <Border Padding="18" BackgroundColor="White" Stroke="#E5E7EB" StrokeThickness="1">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="RECENT POS ACTIVITY" FontSize="12" FontAttributes="Bold" TextColor="#6B7280" />
+                    <Label x:Name="RecentLabel" Text="No posted sales yet today." FontSize="14" TextColor="#6B7280" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -2,6 +2,9 @@ using GreenRetail.Accounting;
 using GreenRetail.Features.CashSessions;
 using GreenRetail.Features.Auth;
 using GreenRetail.Features.Dashboard;
+using GreenRetail.Features;
+using GreenRetail.Features.Catalog;
+using GreenRetail.Features.Checkout;
 using GreenRetail.Features.Hubs;
 using GreenRetail.Features.Register;
 using GreenRetail.InventoryOps;
@@ -27,6 +30,8 @@ public partial class AppShell : Shell
 
         // Core Workspaces
         Routing.RegisterRoute("register", typeof(RegisterPage));
+        Routing.RegisterRoute("pos-cashier", typeof(PosPage));
+        Routing.RegisterRoute("checkout", typeof(CheckoutPage));
         Routing.RegisterRoute("cash-sessions", typeof(CashSessionPage));
         Routing.RegisterRoute("change-password", typeof(ChangePasswordPage));
 
