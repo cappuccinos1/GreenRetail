@@ -62,6 +62,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PurchasingHubPage>();
         builder.Services.AddTransient<QualityControlHubPage>();
         builder.Services.AddTransient<AccountsHubPage>();
+        builder.Services.AddTransient<IAccountingPostingService, AccountingPostingService>();
         builder.Services.AddTransient<AuditHubPage>();
         builder.Services.AddTransient<SettingsHubPage>();
         builder.Services.AddTransient<DashboardViewModel>();
