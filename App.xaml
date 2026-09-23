@@ -8,6 +8,38 @@
             <converters:InverseBoolConverter x:Key="InvertedBoolConverter" />
             <dashboard:FirstLetterConverter x:Key="FirstLetterConverter" />
             <dashboard:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+            <Style x:Key="CashierKeyButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#17181A" />
+                <Setter Property="TextColor" Value="#F5F7FA" />
+                <Setter Property="BorderColor" Value="#3A3D42" />
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="CornerRadius" Value="18" />
+                <Setter Property="FontSize" Value="24" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+            <Style x:Key="CashierAccentKeyButton" TargetType="Button" BasedOn="{StaticResource CashierKeyButton}">
+                <Setter Property="BackgroundColor" Value="#B87910" />
+                <Setter Property="BorderColor" Value="#B87910" />
+            </Style>
+            <Style x:Key="QuickKeyButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#121314" />
+                <Setter Property="TextColor" Value="#F5F7FA" />
+                <Setter Property="BorderColor" Value="#3A3D42" />
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="HeightRequest" Value="50" />
+            </Style>
+            <Style x:Key="QuickKeyButtonActive" TargetType="Button" BasedOn="{StaticResource QuickKeyButton}">
+                <Setter Property="BackgroundColor" Value="#2F6FED" />
+                <Setter Property="BorderColor" Value="#2F6FED" />
+            </Style>
+            <Style x:Key="EmptyQuickKeyButton" TargetType="Button" BasedOn="{StaticResource QuickKeyButton}">
+                <Setter Property="TextColor" Value="#8F99AA" />
+                <Setter Property="BorderColor" Value="#38578E" />
+                <Setter Property="HeightRequest" Value="42" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

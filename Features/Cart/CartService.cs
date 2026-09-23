@@ -52,6 +52,24 @@ public sealed class CartService : ObservableObject, ICartService
         OnPropertyChanged(nameof(Lines));
     }
 
+    public void SetQuantity(Guid productId, decimal quantity)
+    {
+        var existing = Lines.FirstOrDefault(x => x.ProductId == productId);
+        if (existing is null)
+            return;
+
+        if (quantity <= 0m)
+        {
+            Remove(productId);
+            return;
+        }
+
+        Lines.Remove(existing);
+        Lines.Add(existing with { Quantity = quantity });
+        Recalculate();
+        OnPropertyChanged(nameof(Lines));
+    }
+
     public void Remove(Guid productId)
     {
         var existing = Lines.FirstOrDefault(x => x.ProductId == productId);

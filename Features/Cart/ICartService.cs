@@ -23,5 +23,6 @@ public interface ICartService : INotifyPropertyChanged
     void Add(Guid productId, string name, Money unitPrice, bool isWeighed, decimal quantity = 1m);
     void Add(Guid productId, string name, decimal unitPriceNaira, bool isWeighed, decimal quantity = 1m);
     void Remove(Guid productId);
+    void SetQuantity(Guid productId, decimal quantity);
     void Clear();
 }

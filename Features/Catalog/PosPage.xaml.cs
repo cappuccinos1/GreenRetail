@@ -10,19 +10,12 @@ public partial class PosPage : ContentPage
         BindingContext = viewModel;
         _viewModel = viewModel;
 
-        ToolbarItems.Add(new ToolbarItem
-        {
-            Text = "Refresh",
-            Command = _viewModel.SearchCommand,
-            Order = ToolbarItemOrder.Primary
-        });
+    }
 
-        ToolbarItems.Add(new ToolbarItem
-        {
-            Text = "Logout",
-            Command = _viewModel.LogoutCommand,
-            Order = ToolbarItemOrder.Primary
-        });
+    private void OnSearchCompleted(object? sender, EventArgs e)
+    {
+        if (_viewModel.SearchCommand.CanExecute(null))
+            _viewModel.SearchCommand.Execute(null);
     }
 
     protected override async void OnAppearing()

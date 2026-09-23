@@ -6,126 +6,255 @@
              x:Class="GreenRetail.Features.Catalog.PosPage"
              x:Name="RootPage"
              x:DataType="vm:PosViewModel"
-             Title="POS">
+             Title="Cashier"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#17181A">
 
-    <Grid Padding="12"
-          RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,*,Auto"
+          Padding="28,18,28,22"
+          RowSpacing="16">
 
-        <Grid ColumnDefinitions="Auto,*,Auto,Auto"
-              ColumnSpacing="8">
+        <!-- Shop-Ledger-style cashier header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="18">
+            <Button Text="‹"
+                    FontSize="36"
+                    FontAttributes="Bold"
+                    TextColor="#F5F7FA"
+                    BackgroundColor="Transparent"
+                    Padding="0"
+                    WidthRequest="46"
+                    HeightRequest="46"
+                    Command="{Binding BackCommand}" />
 
-            <Label Text="{Binding CurrentUserName, StringFormat='User: {0}'}"
-                   FontAttributes="Bold"
-                   VerticalOptions="Center" />
+            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                <Label Text="CASHIER / POINT OF SALE"
+                       FontSize="21"
+                       FontAttributes="Bold"
+                       TextColor="#F5F7FA" />
+                <Label Text="GreenRetail"
+                       FontSize="13"
+                       TextColor="#8F99AA" />
+            </VerticalStackLayout>
 
-            <Label Grid.Column="1"
-                   Text="{Binding StatusMessage}"
-                   TextColor="Gray"
-                   VerticalOptions="Center" />
-
-            <Button Grid.Column="2"
-                    Text="Refresh"
-                    Command="{Binding SearchCommand}" />
+            <VerticalStackLayout Grid.Column="2" Spacing="1" HorizontalOptions="End" VerticalOptions="Center">
+                <Label Text="{Binding CurrentUserName}"
+                       FontSize="13"
+                       TextColor="#F5F7FA"
+                       HorizontalTextAlignment="End" />
+                <Label Text="Cashier"
+                       FontSize="12"
+                       TextColor="#8F99AA"
+                       HorizontalTextAlignment="End" />
+            </VerticalStackLayout>
 
             <Button Grid.Column="3"
-                    Text="Logout"
-                    Command="{Binding LogoutCommand}" />
+                    Text="⋮"
+                    FontSize="28"
+                    TextColor="#F5F7FA"
+                    BackgroundColor="#202225"
+                    BorderColor="#3A3D42"
+                    BorderWidth="1"
+                    CornerRadius="4"
+                    WidthRequest="48"
+                    HeightRequest="48"
+                    Padding="0" />
         </Grid>
 
-        <SearchBar Grid.Row="1"
-                   Margin="0,10,0,0"
-                   Placeholder="Scan barcode or search product"
-                   Text="{Binding SearchText}"
-                   SearchCommand="{Binding SearchCommand}" />
+        <!-- Main cashier workstation -->
+        <Grid Grid.Row="1" ColumnDefinitions="1.55*,1.05*" ColumnSpacing="18">
 
-        <Grid Grid.Row="2"
-              Margin="0,10,0,0"
-              ColumnDefinitions="2*,*"
-              ColumnSpacing="12">
+            <!-- Left: search + ticket -->
+            <Border Grid.Column="0"
+                    BackgroundColor="#121314"
+                    Stroke="#3A3D42"
+                    StrokeThickness="1"
+                    Padding="20"
+                    StrokeShape="RoundRectangle 16">
+                <Grid RowDefinitions="Auto,Auto,*" RowSpacing="14">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Entry Text="{Binding SearchText}"
+                               Placeholder="Scan barcode / type name or SKU... (F2)"
+                               PlaceholderColor="#737A86"
+                               TextColor="#F5F7FA"
+                               BackgroundColor="#202225"
+                               FontSize="18"
+                               HeightRequest="58"
+                               ClearButtonVisibility="WhileEditing"
+                               ReturnType="Search"
+                               Completed="OnSearchCompleted" />
+                        <Button Grid.Column="1"
+                                Text="▣"
+                                FontSize="20"
+                                TextColor="#F5F7FA"
+                                BackgroundColor="#121314"
+                                BorderColor="#3A3D42"
+                                BorderWidth="1"
+                                CornerRadius="14"
+                                WidthRequest="64"
+                                HeightRequest="58"
+                                Padding="0"
+                                Command="{Binding SearchCommand}" />
+                    </Grid>
 
-            <CollectionView ItemsSource="{Binding Products}"
-                            SelectionMode="None">
+                    <Grid Grid.Row="1" ColumnDefinitions="1.2*,2.6*,0.7*,1*,0.8*,1.2*"
+                          Padding="8,0"
+                          ColumnSpacing="12">
+                        <Label Text="PART NO. / SKU" TextColor="#8F99AA" FontAttributes="Bold" FontSize="12" />
+                        <Label Grid.Column="1" Text="PART DETAILS" TextColor="#8F99AA" FontAttributes="Bold" FontSize="12" />
+                        <Label Grid.Column="2" Text="QTY" TextColor="#8F99AA" FontAttributes="Bold" FontSize="12" />
+                        <Label Grid.Column="3" Text="PRICE" TextColor="#8F99AA" FontAttributes="Bold" FontSize="12" />
+                        <Label Grid.Column="4" Text="DISC" TextColor="#8F99AA" FontAttributes="Bold" FontSize="12" />
+                        <Label Grid.Column="5" Text="LINE TOTAL" TextColor="#8F99AA" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="End" />
+                    </Grid>
 
-                <CollectionView.EmptyView>
-                    <VerticalStackLayout Spacing="10"
-                                         HorizontalOptions="Center"
-                                         VerticalOptions="Center">
-                        <Label Text="No products found."
-                               FontSize="18" />
+                    <CollectionView Grid.Row="2"
+                                    ItemsSource="{Binding Cart.Lines}"
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding SelectedLine}"
+                                    BackgroundColor="Transparent">
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
+                                <Label Text="No items in current sale"
+                                       FontSize="17"
+                                       TextColor="#737A86"
+                                       HorizontalTextAlignment="Center" />
+                                <Label Text="Scan a barcode or search for a product above"
+                                       FontSize="13"
+                                       TextColor="#565C66"
+                                       HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="cart:CartLine">
+                                <Border Margin="0,3"
+                                        Padding="8,10"
+                                        BackgroundColor="#1B1D20"
+                                        Stroke="#303339"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 5">
+                                    <Grid ColumnDefinitions="1.2*,2.6*,0.7*,1*,0.8*,1.2*" ColumnSpacing="12">
+                                        <Label Text="—" TextColor="#AEB5C0" FontSize="13" VerticalTextAlignment="Center" />
+                                        <Label Grid.Column="1" Text="{Binding Name}" TextColor="#F5F7FA" FontSize="14" VerticalTextAlignment="Center" LineBreakMode="TailTruncation" />
+                                        <Label Grid.Column="2" Text="{Binding Quantity, StringFormat='{0:0.##}'}" TextColor="#F5F7FA" FontSize="14" VerticalTextAlignment="Center" />
+                                        <Label Grid.Column="3" Text="{Binding UnitPrice}" TextColor="#F5F7FA" FontSize="14" VerticalTextAlignment="Center" />
+                                        <Label Grid.Column="4" Text="—" TextColor="#737A86" FontSize="14" VerticalTextAlignment="Center" />
+                                        <Label Grid.Column="5" Text="{Binding LineTotal}" TextColor="#F5F7FA" FontSize="14" HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </Border>
 
-                        <Button Text="Search Again"
-                                Command="{Binding BindingContext.SearchCommand, Source={x:Reference RootPage}}" />
-                    </VerticalStackLayout>
-                </CollectionView.EmptyView>
-
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ProductSummary">
-                        <Grid ColumnDefinitions="*,Auto,Auto"
-                              Padding="6"
-                              ColumnSpacing="8">
-
-                            <Label Text="{Binding Name}"
-                                   VerticalOptions="Center" />
-
-                            <Label Grid.Column="1"
-                                   Text="{Binding SellingPrice}"
-                                   VerticalOptions="Center"
-                                   HorizontalOptions="End" />
-
-                            <Button Grid.Column="2"
-                                    Text="Add"
-                                    Command="{Binding BindingContext.AddToCartCommand, Source={x:Reference RootPage}}"
-                                    CommandParameter="{Binding .}" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-
-            <Grid Grid.Column="1"
-                  RowDefinitions="Auto,*,Auto,Auto"
-                  RowSpacing="8">
-
-                <Label Text="Cart"
-                       FontSize="20"
-                       FontAttributes="Bold" />
-
-                <CollectionView Grid.Row="1"
-                                ItemsSource="{Binding Cart.Lines}"
-                                SelectionMode="None">
-
-                    <CollectionView.EmptyView>
-                        <VerticalStackLayout Spacing="10"
-                                             HorizontalOptions="Center"
-                                             VerticalOptions="Center">
-                            <Label Text="Cart is empty."
-                                   FontSize="18" />
+            <!-- Right: totals, actions and numeric keypad -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                    <Border BackgroundColor="#3A202A" StrokeThickness="0" Padding="16,10" StrokeShape="RoundRectangle 14">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="TOTAL" TextColor="#F28FB1" FontAttributes="Bold" FontSize="13" />
+                            <Label Text="{Binding Cart.Subtotal}" TextColor="#F5F7FA" FontAttributes="Bold" FontSize="22" />
                         </VerticalStackLayout>
-                    </CollectionView.EmptyView>
+                    </Border>
+                    <Border Grid.Column="1" BackgroundColor="#17291F" StrokeThickness="0" Padding="16,10" StrokeShape="RoundRectangle 14">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="PAID" TextColor="#00B978" FontAttributes="Bold" FontSize="13" />
+                            <Label Text="₦0.00" TextColor="#F5F7FA" FontAttributes="Bold" FontSize="22" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="2" BackgroundColor="#2C2818" StrokeThickness="0" Padding="16,10" StrokeShape="RoundRectangle 14">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="CHANGE" TextColor="#D08A12" FontAttributes="Bold" FontSize="13" />
+                            <Label Text="₦0.00" TextColor="#F5F7FA" FontAttributes="Bold" FontSize="22" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="cart:CartLine">
-                            <Grid ColumnDefinitions="*,Auto,Auto"
-                                  Padding="4">
-                                <Label Text="{Binding Name}" />
-                                <Label Grid.Column="1"
-                                       Text="{Binding Quantity}"
-                                       Margin="10,0" />
-                                <Label Grid.Column="2"
-                                       Text="{Binding LineTotal}"
-                                       HorizontalOptions="End" />
+                <Grid Grid.Row="1" ColumnDefinitions="*,*,1.35*" ColumnSpacing="10">
+                    <Button Text="HOLD\nF4"
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            BackgroundColor="#76501A"
+                            TextColor="#F5F7FA"
+                            CornerRadius="18"
+                            Command="{Binding HoldCommand}" />
+                    <Button Grid.Column="1" Text="PRINT\nF3"
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            BackgroundColor="#687384"
+                            TextColor="#F5F7FA"
+                            CornerRadius="18"
+                            Command="{Binding PrintCommand}" />
+                    <Button Grid.Column="2" Text="PAY\nF5 →"
+                            FontAttributes="Bold"
+                            FontSize="17"
+                            BackgroundColor="#2F6FED"
+                            TextColor="#FFFFFF"
+                            CornerRadius="18"
+                            Command="{Binding CheckoutCommand}" />
+                </Grid>
+
+                <Border Grid.Row="2"
+                        BackgroundColor="#121314"
+                        Stroke="#3A3D42"
+                        StrokeThickness="1"
+                        Padding="18"
+                        StrokeShape="RoundRectangle 16">
+                    <Grid RowDefinitions="Auto,*" RowSpacing="14">
+                        <Border BackgroundColor="#08150D" StrokeThickness="0" Padding="18,14" StrokeShape="RoundRectangle 12">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="QTY" TextColor="#00B978" FontAttributes="Bold" FontSize="15" VerticalTextAlignment="Center" />
+                                <Label Grid.Column="1" Text="{Binding QuantityInput}" TextColor="#35FF6A" FontAttributes="Bold" FontSize="26" />
                             </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                        </Border>
 
-                <Label Grid.Row="2"
-                       Text="{Binding Cart.Subtotal}"
-                       FontSize="24"
-                       FontAttributes="Bold" />
+                        <Grid Grid.Row="1" RowDefinitions="*,*,*,*" ColumnDefinitions="*,*,*,*" RowSpacing="10" ColumnSpacing="10">
+                            <Button Text="7" Command="{Binding KeypadCommand}" CommandParameter="7" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Column="1" Text="8" Command="{Binding KeypadCommand}" CommandParameter="8" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Column="2" Text="9" Command="{Binding KeypadCommand}" CommandParameter="9" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Column="3" Text="⌫" Command="{Binding BackspaceCommand}" Style="{StaticResource CashierKeyButton}" />
 
-                <Button Grid.Row="3"
-                        Text="Checkout"
-                        Command="{Binding CheckoutCommand}" />
+                            <Button Grid.Row="1" Text="4" Command="{Binding KeypadCommand}" CommandParameter="4" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Row="1" Grid.Column="1" Text="5" Command="{Binding KeypadCommand}" CommandParameter="5" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Row="1" Grid.Column="2" Text="6" Command="{Binding KeypadCommand}" CommandParameter="6" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Row="1" Grid.Column="3" Text="×" Command="{Binding MultiplyCommand}" Style="{StaticResource CashierAccentKeyButton}" />
+
+                            <Button Grid.Row="2" Text="1" Command="{Binding KeypadCommand}" CommandParameter="1" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Row="2" Grid.Column="1" Text="2" Command="{Binding KeypadCommand}" CommandParameter="2" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Row="2" Grid.Column="2" Text="3" Command="{Binding KeypadCommand}" CommandParameter="3" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Row="2" Grid.Column="3" Text="+" Command="{Binding IncrementCommand}" Style="{StaticResource CashierAccentKeyButton}" />
+
+                            <Button Grid.Row="3" Text="0" Command="{Binding KeypadCommand}" CommandParameter="0" Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Row="3" Grid.Column="1" Text="." Command="{Binding KeypadCommand}" CommandParameter="." Style="{StaticResource CashierKeyButton}" />
+                            <Button Grid.Row="3" Grid.Column="2" Text="Enter" Command="{Binding ApplyQuantityCommand}" BackgroundColor="#00A86B" TextColor="#FFFFFF" FontAttributes="Bold" CornerRadius="18" FontSize="15" />
+                            <Button Grid.Row="3" Grid.Column="3" Text="−" Command="{Binding DecrementCommand}" Style="{StaticResource CashierAccentKeyButton}" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Quick-key strip from Shop-Ledger cashier layout -->
+        <Grid Grid.Row="2" RowDefinitions="Auto,Auto" RowSpacing="8">
+            <Grid ColumnDefinitions="Auto,*,*,*,*,*" ColumnSpacing="10">
+                <Label Text="QUICK KEYS" TextColor="#778196" FontAttributes="Bold" FontSize="13" VerticalTextAlignment="Center" />
+                <Button Grid.Column="1" Text="Menu 1" Style="{StaticResource QuickKeyButtonActive}" />
+                <Button Grid.Column="2" Text="Menu 2" Style="{StaticResource QuickKeyButton}" />
+                <Button Grid.Column="3" Text="Menu 3" Style="{StaticResource QuickKeyButton}" />
+                <Button Grid.Column="4" Text="Menu 4" Style="{StaticResource QuickKeyButton}" />
+                <Button Grid.Column="5" Text="Menu 5" Style="{StaticResource QuickKeyButton}" />
+            </Grid>
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*,*,*,*,*" ColumnSpacing="10">
+                <Button Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="1" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="2" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="3" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="4" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="5" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="6" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="7" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="8" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
+                <Button Grid.Column="9" Text="+" Style="{StaticResource EmptyQuickKeyButton}" />
             </Grid>
         </Grid>
     </Grid>
