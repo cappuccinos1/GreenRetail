@@ -45,7 +45,7 @@ public partial class PointOfSaleDashboardPage : ContentPage
 
             if (session is not null)
             {
-                SessionBanner.BackgroundColor = "#ECFDF5";
+                SessionBanner.BackgroundColor = Color.FromArgb("#ECFDF5");
                 SessionBanner.Stroke = new SolidColorBrush(Color.FromArgb("#A7F3D0"));
                 SessionTitle.Text = session.Status == CashSessionStatus.Open ? "Register open" : "Register sent for blind count";
                 SessionTitle.TextColor = Color.FromArgb("#065F46");
@@ -54,7 +54,7 @@ public partial class PointOfSaleDashboardPage : ContentPage
             }
             else
             {
-                SessionBanner.BackgroundColor = "#FEF2F2";
+                SessionBanner.BackgroundColor = Color.FromArgb("#FEF2F2");
                 SessionTitle.Text = "Register closed";
                 SessionTitle.TextColor = Color.FromArgb("#991B1B");
                 SessionDetail.Text = "Open a cash session before starting a sale.";
